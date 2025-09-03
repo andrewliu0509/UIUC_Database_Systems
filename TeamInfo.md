@@ -5,7 +5,7 @@
 |   Info      |        Description     |
 | ----------- | ---------------------- |
 | TeamID      |        Team-044        |
-| TeamName    |         SQLheacy       |
+| TeamName    |         SQLHeavy       |
 | Captain     |       Andrew Liu       |
 | Captain     |  al92@illinois.edu     |
 | Member1     |        Hsin-Yi Lu      |
