@@ -7,12 +7,12 @@
 | TeamID      |        Team-044        |
 | TeamName    |         SQLHeavy       |
 | Captain     |       Andrew Liu       |
-| Captain     |  al92@illinois.edu     |
+| Captain     |   al92@illinois.edu    |
 | Member1     |        Hsin-Yi Lu      |
-| Member1     |   hsinyil3@illinois.edu|
+| Member1     |  hsinyil3@illinois.edu |
 | Member2     |     Chinmay Dandekar   |
-| Member2     |  cud2@illinois.edu     |
-| Member3     |    Syuan-Fu Hwang      |
+| Member2     |   cud2@illinois.edu    |
+| Member3     |     Syuan-Fu Hwang     |
 | Member3     | syuanfu2@illinois.edu  |
 
 ## Project Information
