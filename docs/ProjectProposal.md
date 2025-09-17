@@ -34,6 +34,6 @@ The housing data is from Redfin, hosted by Kaggle ([data link](https://www.kaggl
 ### 8. Distribution
 1. User signup/login and favorite queries and backend systems, and also will handle creating pie charts for visualization
 2. Map visualization systems focusing on heat map, as well as writing the functionality to create the growth heat map
-3. Data pre-processing(ER to SQL) and prediction (because the data in the dataset is too large, need to think about how to extract the desired data and maybe need to split this dataset into several tables?) and setup the barebones website (landing page, header etc)
+3. Data pre-processing (moving from tsv into the SQL database) and prediction feature, as well as setup the barebones website (landing page, header etc)
 4. Add functionality on the setup map (e.g. add the searching bar function, add the filter year period function, etc.) create time series line chart, as well functionality to create turnover, growth and liquidity SQL queries.
 
