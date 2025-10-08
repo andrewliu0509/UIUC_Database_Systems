@@ -1,7 +1,9 @@
-**Explain the assumptions for each entity and relationship in our model**
+# Explain the assumptions for each entity and relationship in our model
 
-Entity Explanations  
-(1st) House Table: This table stores aggregated data about the housing market collected by Redfin. The attributes that create our composite primary key for this table are property\_type\_id, region, and period\_begin. 
+## Entity Explanations  
+
+### House Table
+This table stores aggregated data about the housing market collected by Redfin. The attributes that create our composite primary key for this table are property\_type\_id, region, and period\_begin. 
 
 The property\_type\_id is the type of properties considered, which consist of Single Family Residential, Townhouse, All Residential, Multi-Family (2-4 Unit), Condo/Co-op.
 
@@ -13,11 +15,14 @@ Thus every row in the house table is aggregated data about the **property\_type\
 
 The other attributes in the table are the median price houses were sold at (median\_sale\_price), the median price houses were listed at (median\_list\_price), the median sale price per square foot (median\_ppsf), the median list price per square foot (median\_list\_ppsf), the total number of houses sold (homes\_sold), the median ratio of sell price to list price (sold\_above\_list), the number of pending sales (pending\_sales), the number of new listings (new\_listings), the total number of homes available for sale (inventory), how long it would take to sell all the current homes on the market at the current pace of sales (months\_of\_supply) and the median days on market of houses that were sold (median\_dom).
 
-(2nd) User Table: This table stores the data about users on this website. It includes the user\_id, user\_name and password (hashed). Every time a user sign up needs to store a new row into this table, so we create a new entity for this function.
+### User Table
+This table stores the data about users on this website. It includes the user\_id, user\_name and password (hashed). Every time a user sign up needs to store a new row into this table, so we create a new entity for this function.
 
-(3rd) Location Table: This table stores the data about the location, it includes region, city, state, and parent\_metro\_region. The region can define which city, state, and metropolitan area it is located at. So, we separate this into a different entity so as to decrease the redundancy of our database design.
+### Location Table
+This table stores the data about the location, it includes region, city, state, and parent\_metro\_region. The region can define which city, state, and metropolitan area it is located at. So, we separate this into a different entity so as to decrease the redundancy of our database design.
 
-(4th) User Requesting Table: This table allows users to submit requests to add, modify, or remove housing data. We store these values into a new entity because we have to handle the requests from users independently.
+### User Requesting Table
+This table allows users to submit requests to add, modify, or remove housing data. We store these values into a new entity because we have to handle the requests from users independently.
 
 **report\_id**: The unique auto-incremented id of user request that serves as the primary key  
 **user\_id**: The user\_id that requests the modification (Foreign Key to User.user\_id)  
@@ -29,7 +34,8 @@ The other attributes in the table are the median price houses were sold at (medi
 **sold\_time**:  The sold time of the property that the user requests to modify. Note that this value can be empty if the property user requests isn’t sold  
 **square\_feet**: The size of the property (in square feet) that the user requests to modify 
 
-(5th) Favorite Queries Table: This table stores the user's favorite queries. Since the application allows users to query and visualize the housing data, this table can store queries that the user has favored so that they can easily re-materialize them. Users can query both the aggregated housing data provided by Redfin and stored in the House table and the self-reported granular data stored in the User Requesting Table.
+### Favorite Queries Table
+This table stores the user's favorite queries. Since the application allows users to query and visualize the housing data, this table can store queries that the user has favored so that they can easily re-materialize them. Users can query both the aggregated housing data provided by Redfin and stored in the House table and the self-reported granular data stored in the User Requesting Table.
 
 **query\_id**: The unique auto-incremented id of the query that serves as the primary key  
 **user\_Id**: The user\_id that favorited this query (Foreign Key to User.user\_id)  
@@ -42,14 +48,19 @@ The other attributes in the table are the median price houses were sold at (medi
 **visualization\_type**: The type of visualization the user is interested in for this query. Can include things like line charts, bar charts, histogram, pie charts, etc  
 data\_type: The table that will be queried, either House table or User Requesting Table.
 
-Relationship Explanation  
-(1st) **Location Table to House Table** is **one-many** because each house must be located at one specific region, and each region can have 0 to multiple houses.  
-(2nd) **Location Table to User Requesting Table** is **one-many** because each region 4by the user must be a location in the Location Table, and each region also can occur in 0 to multiple reports.  
-(3rd) **User Table to Favorite Queries Table** is **one-many** because each user might have several favorite queries but each queries can only be favorited by it own user  
-(4th) **User Table to User Requesting Table** is **one-many** because each user can provide many property’s information.  
-(5th) **User Requesting Table to User Table** is **many-many** because each user can add 0 to multiple reported data into its favorite list. Also, each data can be favored by 0 to multiple users on this app.
+## Relationship Explanation  
+### Location Table to House Table
+This relationship is **one-many** because each house must be located at one specific region, and each region can have 0 to multiple houses.  
+### Location Table to User Requesting Table
+This relationship is **one-many** because each region 4by the user must be a location in the Location Table, and each region also can occur in 0 to multiple reports.  
+### User Table to Favorite Queries Table
+This relationship is **one-many** because each user might have several favorite queries but each queries can only be favorited by it own user  
+### User Table to User Requesting Table
+This relationship is **one-many** because each user can provide many property’s information.  
+### User Requesting Table to User Table
+This relationship is **many-many** because each user can add 0 to multiple reported data into its favorite list. Also, each data can be favored by 0 to multiple users on this app.
 
-**Normalize (BCNF)**
+# Normalize (BCNF)
 
 Favorite Query Table:   
 FD1: query\_id → user\_id, period\_begin, period\_end, location\_type, location\_value, property\_type\_id, query\_type, visualization\_type, data\_type
@@ -68,7 +79,7 @@ FD1: property\_type\_id, period\_begin, region → median\_sale\_price, median\_
 FD2: period\_begin \-\> period\_end  
 FD3: property\_type\_id \-\> property\_type
 
-**Logical Design(relational schema)**
+# Logical Design(relational schema)
 
 Favorite Query Table  
 	(  
