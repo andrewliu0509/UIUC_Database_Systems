@@ -122,8 +122,8 @@ Favorite Query Table
 	(  
 query\_id: INT \[PK\]  
 user\_Id: VARCHAR(50) \[FK to User.user\_id\]  
-period\_begin: VARCHAR(10)  
-period\_end: VARCHAR(10)  
+period\_begin: DATE  
+period\_end: DATE  
 location\_type: VARCHAR(5)  
 location\_value: VARCHAR(255)  
 property\_type\_id: VARCHAR(50)  
@@ -133,10 +133,10 @@ data\_type: VARCHAR(20)
 )
 
 User Table  
-(  
+	(  
 user\_name: VARCHAR(255)  
 user\_id: VARCHAR(50) \[PK\]  
-password: VARCHAR(50)  
+user_password: VARCHAR(50)  
 )
 
 User Requesting Table  
@@ -156,14 +156,14 @@ Location Table
 	(  
 region: VARCHAR(50) \[PK\]  
 city: VARCHAR(50)  
-state: VARCHAR(50)  
+us_state: VARCHAR(50)  
 parent\_metro\_region: VARCHAR(50)  
 )
 
 House Table  
 	(  
 property\_type\_id: INT \[PK\] \[FK to Property\_Type.property\_type\_id\]  
-period\_begin: VARCHAR(100) \[PK\] \[FK to Period.period\_begin\]  
+period\_begin: DATE \[PK\] \[FK to Period.period\_begin\]  
 region: VARCHAR(255) \[PK\] \[FK to Location.region\]  
 median\_sale\_price: REAL  
 median\_list\_price: REAL  
@@ -181,12 +181,17 @@ off\_market\_in\_two\_weeks: INT
 
 Period  
 	(  
-	period\_begin: VARCHAR(100) \[PK\]  
-	period\_end: VARCHAR(100)  
-	)
+	period\_begin: DATE \[PK\]  
+	period\_end: DATE  
+)
 
 Property\_Type  
 	(  
 	property\_type\_id: INT \[PK\]  
 	property\_type: VARCHAR(50)  
-	)
+)
+
+Favorite_Report
+	(
+	
+)
