@@ -51,13 +51,13 @@ data\_type: The table that will be queried, either House table or User Requestin
 ## Relationship Explanation  
 ### Location Table to House Table
 This relationship is **one-many** because each house must be located at one specific region, and each region can have 0 to multiple houses.  
-### Location Table to User Requesting Table
-This relationship is **one-many** because each region 4by the user must be a location in the Location Table, and each region also can occur in 0 to multiple reports.  
+### User Table to House Table
+This relationship is **many-many** because each user can request to zero to multiple houses's data, and each house's data can be requested by zero to multiple users. 
 ### User Table to Favorite Queries Table
 This relationship is **one-many** because each user might have several favorite queries but each queries can only be favorited by it own user  
-### User Table to User Requesting Table
+### User Table to User Reporting Table
 This relationship is **one-many** because each user can provide many property’s information.  
-### User Requesting Table to User Table
+### User Reporting Table to User Table
 This relationship is **many-many** because each user can add 0 to multiple reported data into its favorite list. Also, each data can be favored by 0 to multiple users on this app.
 
 # Normalize (3NF)
@@ -86,7 +86,7 @@ User Requesting Table:
 FD1:  
 report\_id → user\_id, region, property\_type, sold\_price, list\_price, list\_time, sold\_time, square\_feet
 
-Minimal Basis: 
+Minimal Basis:  
 report\_id → user\_id, region, property\_type, sold\_price, list\_price, list\_time, sold\_time, square\_feet
 
 3NF decomp.:  
@@ -114,7 +114,7 @@ Minimal Basis:
 period\_begin \-\> period\_end; property\_type\_id \-\> property\_type; property\_type\_id, period\_begin, region → median\_sale\_price, median\_list\_price, median\_ppsf, median\_list\_ppsf, homes\_sold, sold\_above\_list, pending\_sales, new\_listings, inventory, months\_of\_supply, median\_dom  
 
 3NF decomp.:  
-(period\_begin, period\_end), (property\_type\_id,  property\_type), (property\_type\_id, period\_begin, region,  median\_sale\_price, median\_list\_price, median\_ppsf, median\_list\_ppsf, homes\_sold, sold\_above\_list, pending\_sales, new\_listings, inventory, months\_of\_supply, median\_dom)
+(period\_begin, period\_end),    (property\_type\_id,  property\_type), (property\_type\_id, period\_begin, region,  median\_sale\_price, median\_list\_price, median\_ppsf, median\_list\_ppsf, homes\_sold, sold\_above\_list, pending\_sales, new\_listings, inventory, months\_of\_supply, median\_dom)
 
 # Logical Design(relational schema)
 
