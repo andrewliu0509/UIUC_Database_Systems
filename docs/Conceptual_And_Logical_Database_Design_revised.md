@@ -16,12 +16,12 @@ Thus every row in the house table is aggregated data about the **property\_type\
 The other attributes in the table are the median price houses were sold at (median\_sale\_price), the median price houses were listed at (median\_list\_price), the median sale price per square foot (median\_ppsf), the median list price per square foot (median\_list\_ppsf), the total number of houses sold (homes\_sold), the median ratio of sell price to list price (sold\_above\_list), the number of pending sales (pending\_sales), the number of new listings (new\_listings), the total number of homes available for sale (inventory), how long it would take to sell all the current homes on the market at the current pace of sales (months\_of\_supply) and the median days on market of houses that were sold (median\_dom).
 
 ### User Table
-This table stores the data about users on this website. It includes the user\_id, user\_name and password (hashed). Every time a user sign up needs to store a new row into this table, so we create a new entity for this function.
+This table stores the data about users on this website. It includes the user\_id, user\_name and user\_password (hashed). Every time a user sign up needs to store a new row into this table, so we create a new entity for this function.
 
 ### Location Table
-This table stores the data about the location, it includes region, city, state, and parent\_metro\_region. The region can define which city, state, and metropolitan area it is located at. So, we separate this into a different entity so as to decrease the redundancy of our database design.
+This table stores the data about the location, it includes region, city, us\_state, and parent\_metro\_region. The region can define which city, state, and metropolitan area it is located at. So, we separate this into a different entity so as to decrease the redundancy of our database design.
 
-### User Requesting Table
+### User Reporting Table
 This table allows users to submit requests to add, modify, or remove housing data. We store these values into a new entity because we have to handle the requests from users independently.
 
 **report\_id**: The unique auto-incremented id of user request that serves as the primary key  
@@ -74,15 +74,15 @@ query\_id → user\_id, period\_begin, period\_end, location\_type, location\_va
 
 User Table:   
 FD1:  
-user\_id → user\_name, password
+user\_id → user\_name, user\_password
 
 Minimal Basis:  
-user\_id → user\_name, password
+user\_id → user\_name, user\_password
 
 3NF decomp.:  
-(user\_id, user\_name, password)
+(user\_id, user\_name, user\_password)
 
-User Requesting Table:   
+User Reporting Table:   
 FD1:  
 report\_id → user\_id, region, property\_type, sold\_price, list\_price, list\_time, sold\_time, square\_feet
 
@@ -94,13 +94,13 @@ report\_id → user\_id, region, property\_type, sold\_price, list\_price, list\
 
 Location Table:   
 FD1:  
-region → city, state, parent\_metro\_region
+region → city, us\_state, parent\_metro\_region
 
 Minimal Basis:  
-region → city, state, parent\_metro\_region
+region → city, us\_state, parent\_metro\_region
 
 3NF decomp.:  
-(region, city, state, parent\_metro\_region)
+(region, city, us\_state, parent\_metro\_region)
 
 House Table:   
 FD1:  
@@ -121,7 +121,7 @@ period\_begin \-\> period\_end; property\_type\_id \-\> property\_type; property
 Favorite Query Table  
 	(  
 query\_id: INT \[PK\]  
-user\_Id: VARCHAR(50) \[FK to User.user\_id\]  
+user\_id: VARCHAR(50) \[FK to User.user\_id\]  
 period\_begin: DATE  
 period\_end: DATE  
 location\_type: VARCHAR(5)  
@@ -136,10 +136,10 @@ User Table
 	(  
 user\_name: VARCHAR(255)  
 user\_id: VARCHAR(50) \[PK\]  
-user_password: VARCHAR(50)  
+user\_password: VARCHAR(50)  
 )
 
-User Requesting Table  
+User Reporting Table  
 	(  
 report\_id: INT \[PK\]  
 user\_id: VARCHAR(50) \[FK to User.user\_id\]  
@@ -147,8 +147,8 @@ region: VARCHAR(50) \[FK to Location.region\]
 property\_type: VARCHAR(50)  
 sold\_price: REAL   
 list\_price: REAL  
-list\_time: VARCHAR(10)  
-sold\_time: VARCHAR(10)  
+list\_time: Date 
+sold\_time: Date 
 square\_feet: REAL  
 )
 
@@ -156,7 +156,7 @@ Location Table
 	(  
 region: VARCHAR(50) \[PK\]  
 city: VARCHAR(50)  
-us_state: VARCHAR(50)  
+us\_state: VARCHAR(50)  
 parent\_metro\_region: VARCHAR(50)  
 )
 
@@ -191,7 +191,9 @@ Property\_Type
 	property\_type: VARCHAR(50)  
 )
 
-Favorite_Report
-	(
-	
+Favorites\_Report  
+	(  
+	favorite\_user\_id: VARCHAR(50) \[PK\] \[FK to User.user\_id]
+	reporting\_user\_id: VARCHAR(50) \[PK\] \[FK to User\_Reporting.user\_id]
+	report\_id: INT \[PK\] \[FK to User\_Reporting.report\_id]  
 )
