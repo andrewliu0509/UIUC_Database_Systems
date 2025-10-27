@@ -1,3 +1,4 @@
+```
 create table User(
     user_name varchar(255),
     user_id varchar(50) Primary Key,
@@ -70,3 +71,4 @@ create table House(
     Primary Key (property_type_id, period_begin, region),
     Foreign Key (region) References Location(region) ON DELETE CASCADE
 );
+```
