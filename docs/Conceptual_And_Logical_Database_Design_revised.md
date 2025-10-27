@@ -51,8 +51,8 @@ data\_type: The table that will be queried, either House table or User Requestin
 ## Relationship Explanation  
 ### Location Table to House Table
 This relationship is **one-many** because each house must be located at one specific region, and each region can have 0 to multiple houses.  
-### User Table to House Table
-This relationship is **many-many** because each user can request to zero to multiple houses's data, and each house's data can be requested by zero to multiple users. 
+### Location Table to User Reporting Table
+This relationship is **one-many** because each region reported by the user must be a location in the Location Table, and each region also can occur in 0 to multiple reports.
 ### User Table to Favorite Queries Table
 This relationship is **one-many** because each user might have several favorite queries but each queries can only be favorited by it own user  
 ### User Table to User Reporting Table
