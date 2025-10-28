@@ -20,7 +20,8 @@ create table Favorite_Query (
 );
 
 create table Location(
-    region varchar(50) Primary Key,
+    region_id int Primary Key,
+    region varchar(50),
     city varchar(50),
     us_state varchar(50),
     parent_metro_region varchar(50)
@@ -29,7 +30,7 @@ create table Location(
 create table User_Reporting(
     report_id int Primary Key,
     user_id varchar(50),
-    region varchar(50),
+    region_id int,
     property_type varchar(50),
     sold_price real,
     list_price real,
@@ -37,7 +38,7 @@ create table User_Reporting(
     sold_time Date,
     square_feet real,
     Foreign Key (user_id) References User(user_id) ON DELETE CASCADE,
-    Foreign Key (region) References Location(region) ON DELETE CASCADE
+    Foreign Key (region_id) References Location(region_id) ON DELETE CASCADE
 );
 
 create table Favorites_Report(
@@ -53,7 +54,7 @@ create table Favorites_Report(
 create table House(
     property_type_id int,
     period_begin Date,
-    region varchar(255),
+    region_id int,
     period_end Date,
     property_type varchar(50),
     median_sale_price real,
@@ -68,7 +69,7 @@ create table House(
     months_of_supply real,
     median_dom real,
     off_market_in_two_weeks int,
-    Primary Key (property_type_id, period_begin, region),
-    Foreign Key (region) References Location(region) ON DELETE CASCADE
+    Primary Key (property_type_id, period_begin, region_id),
+    Foreign Key (region_id) References Location(region_id) ON DELETE CASCADE
 );
 ```
