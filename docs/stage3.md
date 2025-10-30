@@ -47,8 +47,10 @@ WHERE House.median_ppsf =
     );
 ```
 ### top 15 rows
+![alt text](image-5.png)
 
 ### explain analyze without index
+![alt text](image-6.png)
 
 ### index
 
