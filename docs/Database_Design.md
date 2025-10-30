@@ -1,3 +1,6 @@
+# GCP Connection
+![alt text](./img/image-21.png)
+
 # DDL Commands
 ```sql
 create table User(
@@ -79,6 +82,9 @@ create table House(
     Foreign Key (region_id) References Location(region_id) ON DELETE CASCADE
 );
 ```
+
+# Count Query
+![alt text](./img/image-20.png)
 
 # First query
 ### Find the city, time_period for median_sale_price < 700k for townhouses and <1M for residential in the last 3 years
