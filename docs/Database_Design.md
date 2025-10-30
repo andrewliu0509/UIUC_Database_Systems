@@ -1,3 +1,85 @@
+# DDL Commands
+```sql
+create table User(
+    user_name varchar(255),
+    user_id varchar(50) Primary Key,
+    user_password varchar(50)
+);
+```
+```sql
+create table Favorite_Query (
+    query_id int Primary Key,
+    user_id varchar(50),
+    period_begin Date,
+    period_end Date,
+    location_type varchar(5),
+    location_value varchar(255),
+    property_type_id varchar(50),
+    query_type varchar(50),
+    visualization_type varchar(50),
+    data_type varchar(20),
+    Foreign Key (user_id) References User(user_id) ON DELETE CASCADE
+);
+```
+```sql
+create table Location(
+    region_id int Primary Key,
+    region varchar(50),
+    city varchar(50),
+    us_state varchar(50),
+    parent_metro_region varchar(50)
+);
+```
+```sql
+create table User_Reporting(
+    report_id int Primary Key,
+    user_id varchar(50),
+    region_id int,
+    property_type varchar(50),
+    sold_price real,
+    list_price real,
+    list_time Date,
+    sold_time Date,
+    square_feet real,
+    Foreign Key (user_id) References User(user_id) ON DELETE CASCADE,
+    Foreign Key (region_id) References Location(region_id) ON DELETE CASCADE
+);
+```
+```sql
+create table Favorites_Report(
+    favorite_user_id varchar(50),
+    reporting_user_id varchar(50),
+    report_id int,
+    Primary Key (favorite_user_id, reporting_user_id, report_id),
+    Foreign Key (favorite_user_id) References User(user_id) ON DELETE CASCADE,
+    Foreign Key (reporting_user_id) References User_Reporting(user_id) ON DELETE CASCADE,
+    Foreign Key (report_id) References User_Reporting(report_id) ON DELETE CASCADE
+);
+```
+```sql
+create table House(
+    property_type_id int,
+    period_begin Date,
+    region_id int,
+    period_end Date,
+    property_type varchar(50),
+    median_sale_price real,
+    median_list_price real,
+    median_ppsf real,
+    median_list_ppsf real,
+    homes_sold int,
+    sold_above_list real,
+    pending_sales int,
+    new_listings int,
+    inventory int,
+    months_of_supply real,
+    median_dom real,
+    off_market_in_two_weeks int,
+    Primary Key (property_type_id, period_begin, region_id),
+    Foreign Key (region_id) References Location(region_id) ON DELETE CASCADE
+);
+```
+
 # First query
 ### Find the city, time_period for median_sale_price < 700k for townhouses and <1M for residential in the last 3 years
 ```SQL
@@ -58,7 +140,7 @@ WHERE House.median_ppsf =
 ### index location_city on Location(city)
 ![alt text](./img/image-8.png)
 
-### index house_period_begin on House(period_begin)
+### index house_period_end on House(period_end)
 ![alt text](./img/image-9.png)
 
 # Third query
@@ -80,32 +162,35 @@ LIMIT 15;
 ### index house_property_type on House(property_type)
 ![alt text](./img/image-12.png)
 
-### index location_parent_metro_region on Location(parent_metro_region);
+### index location_parent_metro_region on Location(parent_metro_region)
 ![alt text](./img/image-13.png)
 
-### index house_period_begin on House(period_begin);
+### index house_period_end on House(period_end)
 ![alt text](./img/image-14.png)
 
 # Fourth query
-### Find number of user-reported houses favorited per state by user
+### Find the city in each metropolitan area with the smallest gap between median list price and median sale price in 2024 for Townhouse
 ```SQL
-SELECT city, us_state, parent_metro_region, COUNT(User_Reporting.report_id)
-FROM 
-    User JOIN Favorites_Report
-        ON User.user_id = Favorites_Report.favorite_user_id
-    JOIN User_Reporting
-        ON Favorites_Report.report_id = User_Reporting.report_id
-        AND Favorites_Report.reporting_user_id = User_Reporting.user_id
-WHERE User_Table.user_id = 'sh1'
-GROUP BY Location.us_state
+SELECT L.parent_metro_region, L.city,
+       AVG(H.median_list_price - H.median_sale_price) AS avg_price_gap
+FROM House H
+JOIN Location L ON H.region_id = L.region_id
+WHERE H.period_begin >= '2024-01-01' AND H.period_end < '2025-01-01' AND H.property_type = 'Townhouse'
+GROUP BY L.parent_metro_region, L.city
+ORDER BY avg_price_gap DESC
 LIMIT 15;
 ```
 ### top 15 rows
+![alt text](./img/image-15.png)
 
 ### explain analyze without index
+![alt text](./img/image-16.png)
 
-### index
+### index location_city on Location(city)
+![alt text](./img/image-17.png)
 
-### index
+### index house_property_type on House(property_type)
+![alt text](./img/image-18.png)
 
-### index
+### index location_parent_metro_region on Location(parent_metro_region)
+![alt text](./img/image-19.png)
