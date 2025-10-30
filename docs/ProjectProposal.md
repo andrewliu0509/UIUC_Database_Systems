@@ -10,8 +10,8 @@ The problem that our service aims to solve is while platforms like [Renvify](htt
 ### 4. Creative Components
 We will include different graphs that help us visualize the relations. For data involving time, we include interactive a line time series graph, and for comparison among cities, we can include pie charts. In addition, to display geographic data, we will display heat maps. Some reference images are shown below:
   
-![My_picture](/docs/Cs411%20Ideas%20w%20heart-9.jpg)
-![My_picture](/docs/Cs411%20Ideas%20w%20heart-8.jpg)
+![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-9.jpg)
+![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-8.jpg)
 
 ### 5. Usefulness
 The key functions of our application are the following:
@@ -34,15 +34,15 @@ The housing data is from Redfin, hosted by Kaggle ([data link](https://www.kaggl
     4. Users can click on a prediction button and it’ll return forecasted data (user must select time and location first).
     5. Users can favorite queries to easily see a dashboard that they are interested in, so that they can track changes in the market.
 - a low-fidelity UI mockup:
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-2.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-3.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-4.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-5.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-6.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-7.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-8.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-9.jpg)
-   ![My_picture](/docs/Cs411%20Ideas%20w%20heart-10.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-2.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-3.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-4.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-5.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-6.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-7.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-8.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-9.jpg)
+   ![My_picture](/docs/img/Cs411%20Ideas%20w%20heart-10.jpg)
 
 ### 8. Distribution
 1. User signup/login and favorite queries and backend systems, and also will handle creating pie charts for visualization

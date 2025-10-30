@@ -20,19 +20,19 @@ WHERE h.period_begin < DATE_SUB(CURDATE(), INTERVAL 3 YEAR)
 LIMIT 15; 
 ```
 ### top 15 rows
-![alt text](image.png)
+![alt text](./img/image.png)
 
 ### explain analyze without index
-![alt text](image-1.png)
+![alt text](./img/image-1.png)
 
 ### index house_median_sale_price
-![alt text](image-2.png)
+![alt text](./img/image-2.png)
 
 ### index house_median_sale_price + house_property_type
-![alt text](image-3.png)
+![alt text](./img/image-3.png)
 
 ### index house_property_type
-![alt text](image-4.png)
+![alt text](./img/image-4.png)
 
 # Second query
 
@@ -47,10 +47,10 @@ WHERE House.median_ppsf =
     );
 ```
 ### top 15 rows
-![alt text](image-5.png)
+![alt text](./img/image-5.png)
 
 ### explain analyze without index
-![alt text](image-6.png)
+![alt text](./img/image-6.png)
 
 ### index
 
