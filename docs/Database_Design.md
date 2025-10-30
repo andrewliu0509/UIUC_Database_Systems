@@ -116,6 +116,8 @@ LIMIT 15;
 ### index house_property_type on House(property_type)
 ![alt text](./img/image-4.png)
 
+### Conclusion: Indexing House(property_type) can provide best performance among these tests. While indexing House(median_sale_price) worsen the performance. Indexing House(median_sale_price, property_type) also performs better than no index.
+
 # Second query
 
 ### Find the city and time period with the highest median price per square foot price in America
@@ -143,6 +145,8 @@ WHERE House.median_ppsf =
 ### index house_period_end on House(period_end)
 ![alt text](./img/image-9.png)
 
+### Conclusion: Indexing House(median_ppsf) can provide best performance among these tests. Indexing Location(city) and House(period_end) also performs better than no index.
+
 # Third query
 ### Find highest price of house in a metro area over a time span for Townhouse
 ```SQL
@@ -167,6 +171,8 @@ LIMIT 15;
 
 ### index house_period_end on House(period_end)
 ![alt text](./img/image-14.png)
+
+### Conclusion: Indexing House(property_type) can provide best performance among these tests. While indexing House(period_end) worsen the performance. Indexing Location(parent_metro_region) performs slightly better.
 
 # Fourth query
 ### Find the city in each metropolitan area with the smallest gap between median list price and median sale price in 2024 for Townhouse
@@ -194,3 +200,11 @@ LIMIT 15;
 
 ### index location_parent_metro_region on Location(parent_metro_region)
 ![alt text](./img/image-19.png)
+
+### Conclusion: Indexing House(property_type) can provide best performance among these tests. While indexing Location(city) and Location(parent_metro_region) worsen the performance.
+
+# Final Index Design
+### create index house_property_type on House(property_type);
+Since first, third, and fourth query got the conclusion that indexing House(property_type) would get best performance.
+### create index house_median_ppsf on House(median_ppsf);
+Since second query got the conclusion that indexing House(median_ppsf) would get best performance.
