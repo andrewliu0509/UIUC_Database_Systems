@@ -5,8 +5,9 @@ from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 import os
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\user\OneDrive\Desktop\Database\final_project\housing_dataset\cs411final-476322-f06608fe38c5.json"
-
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\user\OneDrive\Desktop\Database\final_project\housing_dataset\cs411final-476322-f06608fe38c5.json"
+credentials_path=os.path.join(os.path.dirname(__file__), "cs411final-476322-f06608fe38c5.json")
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
 app = Flask(__name__)
 CORS(app)
 
@@ -42,6 +43,13 @@ def get_data():
         for row in result:
             rows.append(dict(row._mapping))
     return jsonify(rows)
+
+@app.route("/houses", methods=["GET"])
+def get_houses_example():
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM House LIMIT 1"))
+        rows = [dict(row._mapping) for row in result]
+        return jsonify(rows)
 
 @app.route("/add", methods=["POST"])
 def add_data():
