@@ -30,8 +30,19 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:5000/add", user);
-      alert("User added successfully!");
+      const response = await axios.post("http://127.0.0.1:5000/add", user);
+
+      // Extract user_id from backend response
+      const newUserId = response.data.user_id;
+
+      // Alert with user_id
+      alert(`User added successfully! Your new user_id = ${newUserId}!`);
+      
+      // --- Clear input fields ---
+      setUser({
+        user_name: "",
+        user_password: ""
+      });
     } catch (err) {
       console.error("Error adding user:", err);
       alert("Failed to add user.");
@@ -119,13 +130,6 @@ function App() {
           required
         />
         <input
-          type="text"
-          placeholder="User ID"
-          value={user.user_id}
-          onChange={(e) => setUser({ ...user, user_id: e.target.value })}
-          required
-        />
-        <input
           type="password"
           placeholder="Password"
           value={user.user_password}
@@ -153,42 +157,5 @@ function App() {
 }
 
 export default App;
-
-
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-/*
-<ul>
-        {data.map((row, idx) => (
-          <li key={idx}>property_type: {row.property_type}</li>
-        ))}
-      </ul>
-      */
-
-      //<h3>Existing House Data (from /data):</h3>
       
       
