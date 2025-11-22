@@ -4,6 +4,7 @@ from flask_cors import CORS
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 import os
+import hashlib
 
 # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\user\OneDrive\Desktop\Database\final_project\housing_dataset\cs411final-476322-f06608fe38c5.json"
 credentials_path=os.path.join(os.path.dirname(__file__), "cs411final-476322-f06608fe38c5.json")
@@ -54,6 +55,11 @@ def get_houses_example():
 @app.route("/add", methods=["POST"])
 def add_data():
     new_item = request.json
+
+    # Hash the password using SHA-1
+    raw_password = new_item["user_password"].encode("utf-8")
+    hashed_password = hashlib.sha1(raw_password).hexdigest()       # 40-character hex string
+
     with engine.connect() as conn:
         conn.execute(
             text(
@@ -62,7 +68,7 @@ def add_data():
             {
                 "user_name":new_item["user_name"],
                 "user_id":new_item["user_id"],
-                "user_password":new_item["user_password"]
+                "user_password":hashed_password,
             }
         )
         conn.commit()
