@@ -30,8 +30,19 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:5000/add", user);
-      alert("User added successfully!");
+      const response = await axios.post("http://127.0.0.1:5000/add", user);
+
+      // Extract user_id from backend response
+      const newUserId = response.data.user_id;
+
+      // Alert with user_id
+      alert(`User added successfully! Your new user_id = ${newUserId}!`);
+      
+      // --- Clear input fields ---
+      setUser({
+        user_name: "",
+        user_password: ""
+      });
     } catch (err) {
       console.error("Error adding user:", err);
       alert("Failed to add user.");
