@@ -118,13 +118,13 @@ function App() {
           onChange={(e) => setUser({ ...user, user_name: e.target.value })}
           required
         />
-        <input
+        {/* <input
           type="text"
           placeholder="User ID"
           value={user.user_id}
           onChange={(e) => setUser({ ...user, user_id: e.target.value })}
           required
-        />
+        /> */}
         <input
           type="password"
           placeholder="Password"
