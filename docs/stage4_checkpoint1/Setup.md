@@ -5,6 +5,9 @@
 git clone https://github.com/cs411-alawini/fa25-cs411-team044-SQLHeavy.git
 ```
 2. enter into stage4_checkpoint1 directory
+```
+cd ./fa25-cs411-team044-SQLHeavy/docs/stage4_checkpoint1
+```
 3. create a new project "App" through react
 ```
 npx create-react-app app
@@ -13,12 +16,13 @@ npx create-react-app app
 ```
 python app.py
 ```
-5. copy the ./App.js to ./app/src/App.js
+5. copy every .js file to app folder
 ```
-cp ./App.js ./app/src/App.js
+cp ./*.js ./app/src/
 ```
 6. enter into app folder and run the App.js file
 ```
 cd app
+npm install react-router-dom axios leaflet react-leaflet (download package for the first time executing)
 npm start
 ```
