@@ -52,7 +52,37 @@ def get_houses_example():
         rows = [dict(row._mapping) for row in result]
         return jsonify(rows)
 
-@app.route("/add", methods=["POST"])
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    user_name = data.get("user_name", "")
+    raw_password = data.get("user_password", "")
+
+    # Hash password the same way as signup
+    hashed_password = hashlib.sha1(raw_password.encode("utf-8")).hexdigest()
+
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM User
+                WHERE user_name = :user_name
+                AND user_password = :user_password
+            """),
+            {
+                "user_name": user_name,
+                "user_password": hashed_password,
+            }
+        )
+
+        count = result.scalar() or 0
+
+    if count >= 1:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False})
+
+@app.route("/signup", methods=["POST"])
 def add_data():
     new_item = request.json
     user_name = new_item["user_name"]

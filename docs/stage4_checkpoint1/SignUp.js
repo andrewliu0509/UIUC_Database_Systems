@@ -23,7 +23,7 @@ function SignUp() {
     }
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/add", {
+      const response = await axios.post("http://127.0.0.1:5000/signup", {
         user_name: user.user_name,
         user_password: user.user_password,
       });
@@ -39,8 +39,8 @@ function SignUp() {
         agree: false,
       });
 
-      // Navigate to main page
-      navigate("/app");
+      // Navigate to login page
+      navigate("/");
     } catch (err) {
       console.error("Error adding user:", err);
       alert("Failed to add user.");
