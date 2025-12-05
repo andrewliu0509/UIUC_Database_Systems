@@ -22,6 +22,34 @@ function SignUp() {
       return;
     }
 
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&]{6,}$/;
+    if (!strongPasswordRegex.test(user.user_password)) {
+      if (user.user_password.length < 6) {
+        alert("Password must be at least 6 characters long.");
+        return;
+      }
+
+      if (!/[a-z]/.test(user.user_password)) {
+        alert("Password must contain at least one lowercase letter.");
+        return;
+      }
+
+      if (!/[A-Z]/.test(user.user_password)) {
+        alert("Password must contain at least one uppercase letter.");
+        return;
+      }
+
+      if (!/\d/.test(user.user_password)) {
+        alert("Password must contain at least one number.");
+        return;
+      }
+
+      if (!/[@$!%*?&#]/.test(user.user_password)) {
+        alert("Password must contain at least one special character (@$!%*?&#).");
+        return;
+      }
+    }
+
     try {
       const response = await axios.post("http://127.0.0.1:5000/signup", {
         user_name: user.user_name,

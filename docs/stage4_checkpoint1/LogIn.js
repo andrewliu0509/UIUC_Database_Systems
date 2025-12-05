@@ -24,6 +24,7 @@ function LogIn() {
 
       if (response.data.success) {
         alert("Login successful!");
+        localStorage.setItem("user_id", response.data.user_id);
         navigate("/app");
       } else {
         alert("Incorrect username or password.");

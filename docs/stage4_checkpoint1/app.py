@@ -64,7 +64,7 @@ def login():
     with engine.connect() as conn:
         result = conn.execute(
             text("""
-                SELECT COUNT(*)
+                SELECT user_id
                 FROM User
                 WHERE user_name = :user_name
                 AND user_password = :user_password
@@ -73,12 +73,17 @@ def login():
                 "user_name": user_name,
                 "user_password": hashed_password,
             }
-        )
+        ).first()
 
-        count = result.scalar() or 0
+        # count = result.scalar() or 0
 
-    if count >= 1:
-        return jsonify({"success": True})
+    # Return user_id to save it in frontend
+    # if count >= 1:
+    #     return jsonify({"success": True, "user_id": result[0]})
+    # else:
+    #     return jsonify({"success": False})
+    if result:
+        return jsonify({"success": True, "user_id": result[0]})
     else:
         return jsonify({"success": False})
 
@@ -125,6 +130,196 @@ def add_data():
         conn.commit()
 
     return jsonify({"status": "success", "user_id": user_id})
+
+# Show reports that user with user_id reported
+@app.route("/user_reports", methods=["GET"])
+def get_user_reports():
+    user_id = request.args.get("user_id")
+
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT *
+                FROM User_Reporting
+                WHERE user_id = :user_id
+            """),
+            {"user_id": user_id}
+        )
+        rows = [dict(row._mapping) for row in result]
+    return jsonify(rows)
+
+# Insert a new report from user
+@app.route("/user_reports", methods=["POST"])
+def insert_user_reports():
+    data = request.json
+    user_id = data.get("user_id", "")
+    location_keyword = data.get("location", "")
+    property_type = data.get("property_type", "")
+    sold_price = data.get("sold_price", "")
+    list_price = data.get("list_price", "")
+    list_time = data.get("list_time", "")
+    sold_time = data.get("sold_time", "")
+    square_feet = data.get("square_feet", "")
+
+    if not [location_keyword, property_type, sold_price, list_price, list_time, sold_time, square_feet]:
+        return jsonify({"status": "failed to insert due to lacking fields"})
+
+    with engine.connect() as conn:
+        # get region_id based on user's input (location)
+        result = conn.execute(
+            text("""
+                SELECT region_id
+                FROM Location
+                WHERE city LIKE :location_keyword 
+                 or us_state LIKE :location_keyword 
+                 or parent_metro_region LIKE :location_keyword
+            """),
+            {"location_keyword": f"%{location_keyword}%"}
+        ).fetchone()
+        region_id = result.region_id
+
+        # get next report_id based on existing count
+        result = conn.execute(
+            text("SELECT MAX(report_id) FROM User_Reporting")
+        )
+        count = result.scalar() or 0
+        report_id = count + 1
+
+        # insert new report
+        conn.execute(
+            text("""
+                INSERT INTO User_Reporting (report_id, user_id, region_id, property_type, sold_price, list_price, list_time, sold_time, square_feet)
+                VALUES (:report_id, :user_id, :region_id, :property_type, :sold_price, :list_price, :list_time, :sold_time, :square_feet)
+            """),
+            {
+                "report_id": report_id,
+                "user_id": user_id,
+                "region_id": region_id,
+                "property_type": property_type,
+                "sold_price": sold_price,
+                "list_price": list_price,
+                "list_time": list_time,
+                "sold_time": sold_time,
+                "square_feet": square_feet
+            }
+        )
+        conn.commit()
+
+    return jsonify({"status": "successfully insert"})
+
+# Update a new report from user
+@app.route("/user_reports", methods=["PUT"])
+def update_user_reports():
+    data = request.json
+    user_id = data.get("user_id", "")
+    location_keyword = data.get("location", "")
+    property_type = data.get("property_type", "")
+    sold_price = data.get("sold_price", "")
+    list_price = data.get("list_price", "")
+    list_time = data.get("list_time", "")
+    sold_time = data.get("sold_time", "")
+    square_feet = data.get("square_feet", "")
+    report_id = data.get("report_id", "")
+
+    if not report_id:
+        return jsonify({"status": "failed to update due to no report_id"})
+
+    with engine.connect() as conn:
+        #get original report
+        original_report = conn.execute(
+            text("""
+                SELECT *
+                FROM User_Reporting
+                WHERE report_id = :report_id
+            """),
+            {"report_id": report_id}
+        ).fetchone()
+        if not original_report:
+            return jsonify({"status": "report not found"})
+        
+        # update_fields = dict(original_report._mapping)
+
+        # for field in ["user_id", "property_type", "sold_price", "list_price", "list_time", "sold_time", "square_feet"]:
+        #     if field in data and data[field] not in [None, ""]:
+        #         update_fields[field] = data[field]
+        
+        # user_id = update_fields["user_id"]
+        # property_type = update_fields["property_type"]
+        # sold_price = update_fields["sold_price"]
+        # list_price = update_fields["list_price"]
+        # list_time = update_fields["list_time"]
+        # sold_time = update_fields["sold_time"]
+        # square_feet = update_fields["square_feet"]
+        # print(update_fields)
+        # get region_id
+        # location_keyword = data.get("location", "")
+        # if location_keyword and location_keyword != "":
+        result = conn.execute(
+            text("""
+                SELECT region_id
+                FROM Location
+                WHERE city LIKE :location_keyword 
+                or us_state LIKE :location_keyword 
+                or parent_metro_region LIKE :location_keyword
+            """),
+            {"location_keyword": f"%{location_keyword}%"}
+        ).fetchone()
+        #     if result:
+        #         region_id = result._mapping["region_id"]
+        #     else:
+        #         region_id = original_report._mapping["region_id"]
+        # else:
+        #     region_id = original_report._mapping["region_id"]
+        region_id = result.region_id
+        # update report
+        conn.execute(
+            text("""
+                UPDATE User_Reporting
+                SET user_id = :user_id, 
+                 region_id = :region_id, 
+                 property_type = :property_type, 
+                 sold_price = :sold_price, 
+                 list_price = :list_price, 
+                 list_time = :list_time, 
+                 sold_time = :sold_time, 
+                 square_feet = :square_feet
+                WHERE report_id = :report_id
+            """),
+            {
+                "report_id": report_id,
+                "user_id": user_id,
+                "region_id": region_id,
+                "property_type": property_type,
+                "sold_price": sold_price,
+                "list_price": list_price,
+                "list_time": list_time,
+                "sold_time": sold_time,
+                "square_feet": square_feet
+            }
+        )
+        conn.commit()
+
+    return jsonify({"status": "successfully update"})
+
+# delete a report from user
+@app.route("/user_reports", methods=["DELETE"])
+def delete_user_reports():
+    data = request.json
+    report_id = data.get("report_id", "")
+
+    with engine.connect() as conn:
+        conn.execute(
+            text("""
+                DELETE FROM User_Reporting
+                WHERE report_id IN :report_id
+            """),
+            {
+                "report_id": tuple(report_id)
+            }
+        )
+        conn.commit()
+
+    return jsonify({"status": "successfully delete"})
 
 if __name__ == "__main__":
     app.run(debug=False)
