@@ -23,6 +23,6 @@ cp ./*.js ./app/src/
 6. enter into app folder and run the App.js file
 ```
 cd app
-npm install react-router-dom axios leaflet react-leaflet (download package for the first time executing)
+npm install react-router-dom axios leaflet react-leaflet leaflet-defaulticon-compatibility  (download package for the first time executing)
 npm start
 ```
