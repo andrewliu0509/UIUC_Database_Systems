@@ -48,7 +48,14 @@ def get_data():
 @app.route("/houses", methods=["GET"])
 def get_houses_example():
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM House LIMIT 1"))
+        result = conn.execute(text("""SELECT * 
+                                   FROM House 
+                                   NATURAL JOIN Location
+                                   WHERE us_state = 'Texas'
+                                   AND period_begin >= '2011-01-01'
+                                   AND period_end <= '2012-02-01'
+                                   AND property_type = 'All Residential'
+                                   LIMIT 8"""))
         rows = [dict(row._mapping) for row in result]
         return jsonify(rows)
 
@@ -82,6 +89,7 @@ def login():
     #     return jsonify({"success": True, "user_id": result[0]})
     # else:
     #     return jsonify({"success": False})
+    print(f"attempted to login user: {user_name}")
     if result:
         return jsonify({"success": True, "user_id": result[0]})
     else:
