@@ -72,6 +72,21 @@ function Home() {
         textAlign: "center"
       }}
     >
+      {/* NEW: User ID badge at top-right */}
+      <div style={{
+        position: "absolute",
+        top: "20px",
+        right: "20px",
+        padding: "10px 15px",
+        backgroundColor: "#776b68ff",
+        color: "white",
+        borderRadius: "12px",
+        fontSize: "16px",
+        fontWeight: "bold"
+      }}>
+        User ID: {localStorage.getItem("user_id")}
+      </div>
+      
       <h1 style={{color: "#493f3cff"}}>RobinSpot Database Demo</h1>
 
       <div
