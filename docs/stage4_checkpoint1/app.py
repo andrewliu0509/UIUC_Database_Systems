@@ -47,15 +47,27 @@ def get_data():
 
 @app.route("/houses", methods=["GET"])
 def get_houses_example():
+    state = request.args.get("state")
+    period_begin = request.args.get("period_begin")
+    period_end = request.args.get("period_end")
+    property_type = request.args.get("property_type")
+
     with engine.connect() as conn:
         result = conn.execute(text("""SELECT * 
                                    FROM House 
                                    NATURAL JOIN Location
-                                   WHERE us_state = 'California'
-                                   AND period_begin >= '2021-01-01'
-                                   AND period_end <= '2022-02-01'
-                                   AND property_type = 'All Residential'
-                                   LIMIT 8"""))
+                                   WHERE us_state = :state
+                                   AND period_begin >= :period_begin
+                                   AND period_end <= :period_end
+                                   AND property_type = :property_type
+                                   LIMIT 8"""),
+                                   {
+            "state": state,
+            "period_begin": period_begin,
+            "period_end": period_end,
+            "property_type": property_type
+        }
+                                   )
         rows = [dict(row._mapping) for row in result]
         return jsonify(rows)
 

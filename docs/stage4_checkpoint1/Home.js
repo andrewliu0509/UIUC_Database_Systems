@@ -13,6 +13,14 @@ function Home() {
   const [data, setData] = useState([]);
   const [houses, setHouses] = useState([]);
   const [user, setUser] = useState({ user_name: "", user_password: "" });
+  
+  const[houseExample, setHouseExample] = useState({
+    state: "California",
+    property_type: "All Residential",
+    period_begin: "2021-01-01",
+    period_end: "2022-02-01",
+  });
+
 
   // GET requests
   useEffect(() => {
@@ -21,14 +29,36 @@ function Home() {
       .catch((err) => console.error("Error fetching data:", err));
   }, []);
 
+  const loadHouses = async (params) => {
+    try {
+      const res = await axios.get("http://127.0.0.1:5000/houses", {
+        params: {
+          state: params.state,
+          property_type: params.property_type,
+          period_begin: params.period_begin,
+          period_end: params.period_end,
+          limit: 8,
+        }
+      });
+      setHouses(res.data);
+    } catch (err) {
+      console.error("Error fetching houses:", err);
+      setHouses([]);
+    }
+  };
+
   useEffect(() => {
-    axios.get("http://127.0.0.1:5000/houses")
-      .then((res) => setHouses(res.data))
-      .catch((err) => console.error("Error fetching houses:", err));
+    loadHouses(houseExample);
   }, []);
 
-
-
+    const handleHouseSearch = () => {
+    const { state, property_type, period_begin, period_end } = houseExample;
+    if (!state || !property_type || !period_begin || !period_end) {
+      alert("Please fill out state, property type, and date range.");
+      return;
+    }
+    loadHouses(houseExample);
+  };
 
 
 
@@ -75,12 +105,91 @@ function Home() {
         }}
       >
 
-        {houses.length == 0? <p>No house data found for this query</p>:
+      
+      <div
+        style={{
+          backgroundColor: "white",
+          width: "82%",
+          margin: "30px auto 0",
+          padding: "30px",
+          border: "2px solid black",
+          borderRadius: "10px",
+          textAlign: "left"
+        }}
+      >
+        <h2 style={{ marginBottom: "15px" }}>Filter Houses</h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "16px",
+          }}
+        >
+          <label>State</label>
+          <input
+            type="text"
+            style={inputStyle}
+            value={houseExample.state}
+            onChange={(e) => setHouseExample({ ...houseExample, state: e.target.value })}
+            placeholder="e.g., California"
+          />
+
+          <label>Property Type</label>
+          <select
+            style={inputStyle}
+            value={houseExample.property_type}
+            onChange={(e) => setHouseExample({ ...houseExample, property_type: e.target.value })}
+          >
+            <option value="All Residential">All Residential</option>
+            <option value="Condo/Co-op">Condo/Co-op</option>
+            <option value="Multi-Family (2-4 Unit)">Multi-Family (2-4 Unit)</option>
+            <option value="Single Family Residential">Single Family Residential</option>
+            <option value="Townhouse">Townhouse</option>
+          </select>
+
+          <label>Period Begin</label>
+          <input
+            type="text"
+            style={inputStyle}
+            value={houseExample.period_begin}
+            onChange={(e) => setHouseExample({ ...houseExample, period_begin: e.target.value })}
+            placeholder="YYYY-MM-DD"
+          />
+
+          <label>Period End</label>
+          <input
+            type="text"
+            style={inputStyle}
+            value={houseExample.period_end}
+            onChange={(e) => setHouseExample({ ...houseExample, period_end: e.target.value })}
+            placeholder="YYYY-MM-DD"
+          />
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: "10px" }}>
+          <button onClick={handleHouseSearch} style={buttonStyle}>
+            Search Houses
+          </button>
+        </div>
+      </div>
+
+        <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginTop: "20px",
+          justifyContent: "center",
+          alignItems: "flex-start"
+        }}
+      >
+        {houses.length === 0? <p>No house data found for this query</p>:
         <>
           <HouseTable houses={houses} />
           <MapView houses={houses} />
         </>
         }
+      </div>
       </div>
     </div>
   );
