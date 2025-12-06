@@ -58,6 +58,13 @@ function Home() {
         >
           User Reports Table
         </button>
+
+        <button
+          onClick={() => navigate("/price_ranking")}
+          style={buttonStyle}
+        >
+          City Price Ranking
+        </button>
       </div>
 
       <div

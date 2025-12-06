@@ -26,7 +26,10 @@ function AutoFitBounds({ positions }) {
 
 
 export async function geocodeRegion(region) {
-
+  if (typeof region !== "string" || !region.trim()) {
+    console.warn("Invalid region value:", region);
+    return null;
+  }
   const key = region.trim().toLowerCase();
 
   if (key in geocodeCache) {

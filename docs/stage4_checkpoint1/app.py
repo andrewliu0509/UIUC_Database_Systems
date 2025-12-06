@@ -51,9 +51,9 @@ def get_houses_example():
         result = conn.execute(text("""SELECT * 
                                    FROM House 
                                    NATURAL JOIN Location
-                                   WHERE us_state = 'Texas'
-                                   AND period_begin >= '2011-01-01'
-                                   AND period_end <= '2012-02-01'
+                                   WHERE us_state = 'California'
+                                   AND period_begin >= '2021-01-01'
+                                   AND period_end <= '2022-02-01'
                                    AND property_type = 'All Residential'
                                    LIMIT 8"""))
         rows = [dict(row._mapping) for row in result]
@@ -328,6 +328,54 @@ def delete_user_reports():
         conn.commit()
 
     return jsonify({"status": "successfully delete"})
+
+@app.route("/price_ranking", methods=["POST"])
+def price_ranking():
+    data = request.json or {}
+    pr_city = data.get("city")
+    pr_state = data.get("state", "")
+    pr_property_type_id = data.get("property_type_id")
+    pr_period_start = data.get("period_start")
+    pr_period_end = data.get("period_end")
+    pr_metric = data.get("metric")
+
+    if not (pr_city and pr_state and pr_property_type_id and pr_period_start and pr_period_end):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                CALL PriceRankings(
+                    :pr_city,
+                    :pr_state,
+                    :pr_property_type_id,
+                    :pr_period_start,
+                    :pr_period_end,
+                    :pr_metric
+                )
+            """),
+            {
+                "pr_city": pr_city,
+                "pr_state": pr_state,
+                "pr_property_type_id": pr_property_type_id,
+                "pr_period_start": pr_period_start,
+                "pr_period_end": pr_period_end,
+                "pr_metric": pr_metric
+            }
+        )
+
+        row = result.mappings().first()
+
+    if not row:
+        return jsonify({
+            "metric_value": None,
+            "rank_in_state": None,
+            "total_cities_in_state": None,
+            "rank_in_nation": None,
+            "total_cities_in_nation": None
+        })
+
+    return jsonify(dict(row))
 
 if __name__ == "__main__":
     app.run(debug=False)
