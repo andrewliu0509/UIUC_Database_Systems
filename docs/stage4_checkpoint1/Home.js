@@ -33,8 +33,16 @@ function Home() {
 
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h2>RobinSpot Database Demo</h2>
+    <div
+      style={{
+        backgroundColor: "#F2EFDF",
+        minHeight: "100vh",
+        padding: "30px",
+        fontFamily: "Arial, sans-serif",
+        textAlign: "center"
+      }}
+    >
+      <h1 style={{color: "#493f3cff"}}>RobinSpot Database Demo</h1>
 
       <div
         style={{
@@ -85,9 +93,11 @@ const buttonStyle = {
   width: "120px",
   padding: "10px",
   fontSize: "16px",
-  border: "2px solid black",
-  backgroundColor: "transparent",
+  border: "2px solid #776b68ff",
+  backgroundColor: "#776b68ff",
+  color: "white",
   cursor: "pointer",
+  borderRadius: "15px",
 };
 
 export default Home;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, use } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function UserReports() {
   const [reports, setReports] = useState([]);
@@ -14,6 +15,7 @@ function UserReports() {
     square_feet: "",
   });
   const [selectedReport, setSelectedReport] = useState([]);
+  const navigate = useNavigate();
 
   const user_id = localStorage.getItem("user_id");
 
@@ -80,6 +82,9 @@ function UserReports() {
         alert("Report updated successfully!");
         reload();
       }
+      else if (response.data.status === "failed to update due to lacking fields") {
+        alert("Failed to update. Please fill out every field.");
+      }
       else if (response.data.status === "report not found") {
         alert("Report not found. Please check your Report ID.");
       }
@@ -128,17 +133,24 @@ return (
         fontFamily: "Arial, sans-serif",
       }}
     >
-        <h1 style={{ textAlign: "center", marginBottom: "30px" }}>User Reports</h1>
+        <h1 style={{ color: "#493f3cff", textAlign: "center", marginBottom: "30px" }}>User Reports</h1>
+        <button
+          onClick={() => navigate("/app")}
+          style={{...buttonStyle}}
+        >
+          Back to Home
+        </button>
         <div
           style={{
             backgroundColor: "white",
             width: "82%",
             margin: "40px auto 0",
             padding: "50px",
-            border: "2px solid black",
+            border: "2px solid white",
+            borderRadius: "15px",
           }}
         >
-            <h2 style={{ marginBottom: "20px" }}>Form:</h2>
+            <h2 style={{marginBottom: "20px" }}>Form:</h2>
             <div
               style={{
                 display: "grid",
@@ -263,7 +275,9 @@ return (
             margin: "40px auto 0",
             maxHeight: "400px",
             overflowY: "auto",
+            backgroundColor: "white",
             border: "2px solid #555",
+            borderRadius: "15px",
           }}
         >
           <table border="1" cellPadding="5" style={{ borderCollapse: "collapse", width: "100%" }}>
@@ -337,10 +351,12 @@ const buttonStyle = {
   width: "120px",
   padding: "10px",
   fontSize: "16px",
-  border: "2px solid black",
-  backgroundColor: "transparent",
+  border: "2px solid #776b68ff",
+  backgroundColor: "#776b68ff",
+  color: "white",
   cursor: "pointer",
   whiteSpace: "nowrap",
+  borderRadius: "15px",
 };
     
 export default UserReports;
