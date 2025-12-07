@@ -1,4 +1,4 @@
-DELIMITER $$
+DELIMITER //
 
 CREATE TRIGGER check_user_report_update
 BEFORE UPDATE ON User_Reporting
@@ -23,6 +23,6 @@ BEGIN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'Square feet must be positive';
     END IF;
-END$$
+END//
 
 DELIMITER ;

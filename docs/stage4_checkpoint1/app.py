@@ -60,7 +60,7 @@ def get_houses_example():
                                    AND period_begin >= :period_begin
                                    AND period_end <= :period_end
                                    AND property_type = :property_type
-                                   LIMIT 8"""),
+                                   LIMIT 15"""),
                                    {
             "state": state,
             "period_begin": period_begin,
@@ -352,7 +352,7 @@ def price_ranking():
     pr_metric = data.get("metric")
 
     if not (pr_city and pr_state and pr_property_type_id and pr_period_start and pr_period_end):
-        return jsonify({"error": "Missing required fields"}), 400
+        return jsonify({"error": "Missing required fields"})
 
     with engine.connect() as conn:
         result = conn.execute(
@@ -388,6 +388,43 @@ def price_ranking():
         })
 
     return jsonify(dict(row))
+
+@app.route("/show_metric", methods=["POST"])
+def show_metric():
+    data = request.json or {}
+    period_begin = data.get("period_begin")
+    period_end = data.get("period_end")
+    location_type = data.get("location_type")    
+    location_value = data.get("location_value")
+    property_type = data.get("property_type")
+    query_type = data.get("query_type")       
+    if not (period_begin and period_end and location_type and location_value and property_type and query_type):
+        return jsonify({"error": "Missing required fields"})
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                CALL ShowMetric(
+                    :period_begin,
+                    :period_end,
+                    :location_type,
+                    :location_value,
+                    :property_type,
+                    :query_type
+                )
+            """),
+            {
+                "period_begin": period_begin,
+                "period_end": period_end,
+                "location_type": location_type,
+                "location_value": location_value,
+                "property_type": property_type,
+                "query_type": query_type
+            }
+        )
+        rows = result.mappings().all()
+    return jsonify([dict(r) for r in rows])
+
+
 
 if __name__ == "__main__":
     app.run(debug=False)

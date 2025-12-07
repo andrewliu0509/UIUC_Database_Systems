@@ -13,7 +13,7 @@ function Home() {
   const [data, setData] = useState([]);
   const [houses, setHouses] = useState([]);
   const [user, setUser] = useState({ user_name: "", user_password: "" });
-  
+
   const[houseExample, setHouseExample] = useState({
     state: "California",
     property_type: "All Residential",
@@ -49,7 +49,7 @@ function Home() {
 
   useEffect(() => {
     loadHouses(houseExample);
-  }, []);
+  });
 
     const handleHouseSearch = () => {
     const { state, property_type, period_begin, period_end } = houseExample;
@@ -59,8 +59,6 @@ function Home() {
     }
     loadHouses(houseExample);
   };
-
-
 
   return (
     <div
@@ -72,7 +70,7 @@ function Home() {
         textAlign: "center"
       }}
     >
-      {/* NEW: User ID badge at top-right */}
+
       <div style={{
         position: "absolute",
         top: "20px",
@@ -86,8 +84,8 @@ function Home() {
       }}>
         User ID: {localStorage.getItem("user_id")}
       </div>
-      
-      <h1 style={{color: "#493f3cff"}}>RobinSpot Database Demo</h1>
+
+      <h1 style={{color: "#493f3cff"}}>RobinSpot</h1>
 
       <div
         style={{
@@ -103,13 +101,19 @@ function Home() {
         >
           User Reports Table
         </button>
-
         <button
           onClick={() => navigate("/price_ranking")}
           style={buttonStyle}
         >
           City Price Ranking
         </button>
+        <button
+          onClick={() => navigate("/show_metric")}
+          style={buttonStyle}
+        >
+          Show Metric
+        </button>
+
       </div>
 
       <div
@@ -124,8 +128,8 @@ function Home() {
       <div
         style={{
           backgroundColor: "white",
-          width: "82%",
-          margin: "30px auto 0",
+          width: "20%",
+          margin: "20px auto 0",
           padding: "30px",
           border: "2px solid black",
           borderRadius: "10px",
