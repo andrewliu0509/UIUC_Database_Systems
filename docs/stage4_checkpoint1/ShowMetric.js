@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,9 +6,11 @@ import {
   BarChart, Bar,
   XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
 } from "recharts";
+import {v4 as uuidv4} from "uuid";
 
 function ShowMetric() {
   const navigate = useNavigate();
+  const user_id = localStorage.getItem("user_id");
 
   const QUERY_TYPES = [
     "median_sale_price",
@@ -45,6 +47,106 @@ function ShowMetric() {
 
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedSearchReport, setSelectedSearchReport] = useState([]);
+  const [selectedFavReport, setSelectedFavReport] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [selectedDraw, setSelectedDraw] = useState([]);
+
+  const handleSelectSearch = (id) => {
+    if (selectedSearchReport.includes(id)) {
+      setSelectedSearchReport(selectedSearchReport.filter(item => item !== id));
+    } else {
+      setSelectedSearchReport([...selectedSearchReport, id]);
+    }
+  };
+
+  const handleSelectFav = (id) => {
+    if (selectedFavReport.includes(id)) {
+      setSelectedFavReport(selectedFavReport.filter(item => item !== id));
+    } else {
+      setSelectedFavReport([...selectedFavReport, id]);
+    }
+  };
+
+  const handleSelectDraw = (id) => {
+    if (selectedDraw.includes(id)) {
+      setSelectedDraw(selectedDraw.filter(item => item !== id));
+    } else {
+      setSelectedDraw([...selectedDraw, id]);
+    }
+  };
+
+  const loadFavorite = async () => {
+        try {
+            const response = await axios.get("http://127.0.0.1:5000/favorite_query", {
+                params: { user_id: user_id },
+            });
+            setReports(response.data);
+        } catch (err) {
+            console.error("Error loading favorite reports:", err);
+        }
+    };
+
+    useEffect(() => {
+        loadFavorite();
+    }, []);
+
+  const dateFormat = (date) => {
+    const d = new Date(date);
+    return d.toISOString().split("T")[0];
+  }
+
+  const handleFavorite = async () => {
+    if (selectedSearchReport.length === 0) {
+      alert("No reports selected to add to favorites.");
+      return;
+    }
+    const select = rows.filter(r => selectedSearchReport.includes(r.id));
+    try {
+      for (const s of select) {
+        const data = {
+          user_id: user_id,
+          period_begin: dateFormat(s.period_begin),
+          period_end: dateFormat(s.period_end),
+          location_type: form.location_type,
+          location_value: form.location_value,
+          property_type_id: form.property_type,
+          query_type: form.query_type,
+          vis_type: form.vis_type,
+        };
+
+        const response = await axios.post("http://127.0.0.1:5000/favorite_query", data);
+        if (response.data.status === "successfully insert") {
+          alert("Reports added to favorites successfully.");
+          loadFavorite();
+        }
+      }
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+      alert("Failed to add reports to favorites.");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (selectedFavReport.length === 0) {
+      alert("No favorite reports selected to delete.");
+      return;
+    }
+    try {
+      const response = await axios.delete("http://127.0.0.1:5000/favorite_query", {
+        data: {
+          query_id: selectedFavReport,
+        },
+      });
+      if (response.data.status === "successfully delete") {
+        alert("Favorite reports deleted successfully.");
+        loadFavorite();
+      }
+    } catch (error) {
+      console.error("Error deleting favorite reports:", error);
+      alert("Failed to delete favorite reports.");
+    }
+  };
 
   const handleSearch = async () => {
     const {
@@ -54,6 +156,7 @@ function ShowMetric() {
       location_value,
       property_type,
       query_type,
+      vis_type,
     } = form;
 
     if (!period_begin || !period_end || !location_type || !location_value || !property_type || !query_type) {
@@ -72,13 +175,65 @@ function ShowMetric() {
         query_type,
       });
 
-      setRows(response.data || []);
+      setRows((response.data || []).map((r) => ({
+        ...r,
+        id: uuidv4(),
+      })));
     } catch (err) {
       console.error("ShowMetric error:", err);
       alert("Failed to fetch metric data. Check inputs or backend.");
       setRows([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDraw = async () => {
+    if (selectedDraw.length === 0) {
+      alert("No favorite reports selected to draw.");
+      return;
+    }
+
+    const report = reports.filter(r => selectedDraw.includes(r.query_id));
+    let p_begin = dateFormat(report[0].period_begin);
+    let p_end = dateFormat(report[0].period_end);
+    for (const i of report) {
+      if (report[0].location_type !== i.location_type ||
+          report[0].location_value !== i.location_value ||
+          report[0].property_type_id !== i.property_type_id ||
+          report[0].query_type !== i.query_type) {
+        alert("Please select favorite reports with the same parameters to draw.");
+        return;
+      }
+      if (dateFormat(i.period_begin) < p_begin) {
+        p_begin = dateFormat(i.period_begin);
+      }
+      if (dateFormat(i.period_end) > p_end) {
+        p_end = dateFormat(i.period_end);
+      }
+    }
+    
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/show_metric", {
+        period_begin: p_begin,
+        period_end: p_end,
+        location_type: report[0].location_type,
+        location_value: report[0].location_value,
+        property_type: report[0].property_type_id,
+        query_type: report[0].query_type,
+      });
+      if (response.data.length === 0) {
+        alert("Failed to draw.");
+      }
+      setRows((response.data || []).map((r) => ({
+        ...r,
+        id: uuidv4(),
+      })));
+
+    } catch (error) {
+      console.error("Error drawing favorite reports:", error);
+      alert("Failed to draw favorite reports.");
+      setRows([]);
     }
   };
 
@@ -93,6 +248,7 @@ function ShowMetric() {
   const chartData = useMemo(() => {
     return (rows || [])
       .map((r) => ({
+        id: r.id,
         period_begin: r.period_begin,
         period_end: r.period_end,
         location: getLocationField(r),
@@ -237,7 +393,8 @@ function ShowMetric() {
           </button>
         </div>
       </div>
-
+      
+      <h2 style={{ color: "#493f3cff", textAlign: "center", marginBottom: "20px" }}>Chart</h2>
       <div
         style={{
           backgroundColor: "white",
@@ -249,7 +406,7 @@ function ShowMetric() {
           borderRadius: "15px",
         }}
       >
-        <h2 style={{ marginBottom: "10px", color:"#493f3cff" }}>Chart</h2>
+        {/* <h2 style={{ marginBottom: "10px", color:"#493f3cff" }}>Chart</h2> */}
 
         <div style={{ width: "100%", height: "340px" }}>
           <ResponsiveContainer>
@@ -276,6 +433,7 @@ function ShowMetric() {
         </div>
       </div>
 
+      <h2 style={{ color: "#493f3cff", textAlign: "center", marginBottom: "20px" }}>Searching Result</h2>
       <div
         style={{
           width: "90%",
@@ -298,6 +456,7 @@ function ShowMetric() {
               <th>location</th>
               <th>property_type</th>
               <th>{form.query_type}</th>
+              <th>Select to Add to Favorite</th>
             </tr>
           </thead>
           <tbody>
@@ -309,6 +468,13 @@ function ShowMetric() {
                   <td>{r.location}</td>
                   <td>{r.property_type}</td>
                   <td>{r.value}</td>
+                  <td>
+                      <input
+                      type="checkbox"
+                      checked={selectedSearchReport.includes(r.id)}
+                      onChange={() => handleSelectSearch(r.id)}
+                      />
+                  </td>
                 </tr>
               ))
             ) : (
@@ -320,6 +486,108 @@ function ShowMetric() {
             )}
           </tbody>
         </table>
+        </div>
+        <div
+            style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "20px",
+            marginTop: "25px",
+            }}
+        >
+        {/* Add button */}
+        <button
+            onClick={handleFavorite}
+            style={buttonStyle}
+        >
+        Add
+        </button>
+        
+      </div>
+
+      <h2 style={{ color: "#493f3cff", textAlign: "center", marginBottom: "20px" }}>My Favorite queries</h2>
+      <div
+      style={{
+          width: "90%",
+          margin: "40px auto 0",
+          padding: "20px",
+          backgroundColor: "white",
+          borderRadius: "15px",
+          // border: "2px solid #555",
+      }}
+      >
+        {/* show favorite report */}
+        <table border="1" cellPadding="5" style={{ borderCollapse: "collapse", width: "100%" }}>
+        <thead>
+            <tr>
+            <th>Query ID</th>
+            {/* <th>User ID</th> */}
+            <th>Period Begin</th>
+            <th>Period End</th>
+            <th>Location Type</th>
+            <th>Location Value</th>
+            <th>Property Type ID</th>
+            <th>Query Type</th>
+            <th>Visualization Type</th>
+            <th>Data Type</th>
+            <th>Select to Delete</th>
+            <th>Select to Draw</th>
+            </tr>
+        </thead>
+        <tbody>
+            {reports.map((report) => (
+            <tr key={report.query_id}>
+                <td>{report.query_id }</td>
+                {/* <td>{report.user_id}</td> */}
+                <td>{report.period_begin }</td>
+                <td>{report.period_end }</td>
+                <td>{report.location_type}</td>
+                <td>{report.location_value}</td>
+                <td>{report.property_type_id}</td>
+                <td>{report.query_type}</td>
+                <td>{report.visualization_type}</td>
+                <td>{report.data_type}</td>
+                <td>
+                    <input
+                    type="checkbox"
+                    checked={selectedFavReport.includes(report.query_id)}
+                    onChange={() => handleSelectFav(report.query_id)}
+                    />
+                </td>
+                <td>
+                    <input
+                    type="checkbox"
+                    checked={selectedDraw.includes(report.query_id)}
+                    onChange={() => handleSelectDraw(report.query_id)}
+                    />
+                </td>
+            </tr>
+            ))}
+        </tbody>
+        </table>
+      </div>
+      <div
+          style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "20px",
+          marginTop: "25px",
+          }}
+      >
+      {/* delete button */}
+      <button
+          onClick={handleDelete}
+          style={buttonStyle}
+      >
+      Delete
+      </button>
+      {/* draw button */}
+      <button
+          onClick={handleDraw}
+          style={buttonStyle}
+      >
+      Draw
+      </button>
       </div>
     </div>
   );

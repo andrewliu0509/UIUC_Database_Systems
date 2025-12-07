@@ -381,7 +381,7 @@ function FavoriteReports() {
                     marginTop: "25px",
                     }}
                 >
-                    {/* Add button */}
+                    {/* delete button */}
                     <button
                         onClick={handleDelete}
                         style={buttonStyle}

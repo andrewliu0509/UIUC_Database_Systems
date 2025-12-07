@@ -570,5 +570,91 @@ def delete_favorites_report():
 
     return jsonify({"status": "successfully delete"})
 
+@app.route("/favorite_query", methods=["POST"])
+def insert_favorite_query():
+    data = request.json
+    user_id = data.get("user_id")
+    period_begin = data.get("period_begin")
+    period_end = data.get("period_end")
+    location_type = data.get("location_type")    
+    location_value = data.get("location_value")
+    # location = data.get("location")
+    property_type = data.get("property_type_id")
+    query_type = data.get("query_type")
+    visualization_type = data.get("vis_type")
+    data_type = "House"
+     
+    if not (period_begin and period_end and location_type and location_value and property_type and query_type and visualization_type):
+        return jsonify({"error": "Missing required fields"})
+    
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("SELECT MAX(query_id) FROM Favorite_Query")
+        )
+        count = result.scalar() or 0
+        query_id = count + 1
+
+        result = conn.execute(
+            text("""
+                INSERT INTO Favorite_Query (query_id, user_id, 
+                period_begin, period_end, location_type, 
+                location_value, property_type_id, query_type, visualization_type, data_type)
+                VALUES (:query_id, :user_id, 
+                :period_begin, :period_end, :location_type,
+                :location_value, :property_type_id, :query_type, :visualization_type, :data_type
+                )
+            """),
+            {
+                "query_id": query_id,
+                "user_id": user_id,
+                "period_begin": period_begin,
+                "period_end": period_end,
+                "location_type": location_type,
+                "location_value": location_value,
+                "property_type_id": property_type,
+                "query_type": query_type,
+                "visualization_type": visualization_type,
+                "data_type": data_type
+            }
+        )
+        conn.commit()
+        
+    return jsonify({"status": "successfully insert"})
+
+@app.route("/favorite_query", methods=["GET"])
+def get_favorite_query():
+    user_id = request.args.get("user_id")
+
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT *
+                FROM Favorite_Query
+                WHERE user_id = :user_id
+            """),
+            {"user_id": user_id}
+        )
+        rows = [dict(row._mapping) for row in result]
+    return jsonify(rows)
+
+@app.route("/favorite_query", methods=["DELETE"])
+def delete_favorite_query():
+    data = request.json
+    query_id = data.get("query_id", "")
+
+    with engine.connect() as conn:
+        conn.execute(
+            text("""
+                DELETE FROM Favorite_Query
+                WHERE query_id IN :query_id
+            """),
+            {
+                "query_id": tuple(query_id)
+            }
+        )
+        conn.commit()
+
+    return jsonify({"status": "successfully delete"})
+
 if __name__ == "__main__":
     app.run(debug=False)
