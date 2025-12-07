@@ -21,7 +21,6 @@ function Home() {
     period_end: "2022-02-01",
   });
 
-
   // GET requests
   useEffect(() => {
     axios.get("http://127.0.0.1:5000/data")
@@ -37,7 +36,7 @@ function Home() {
           property_type: params.property_type,
           period_begin: params.period_begin,
           period_end: params.period_end,
-          limit: 8,
+          limit: 15,
         }
       });
       setHouses(res.data);
@@ -49,9 +48,9 @@ function Home() {
 
   useEffect(() => {
     loadHouses(houseExample);
-  });
+  }, []);
 
-    const handleHouseSearch = () => {
+  const handleHouseSearch = () => {
     const { state, property_type, period_begin, period_end } = houseExample;
     if (!state || !property_type || !period_begin || !period_end) {
       alert("Please fill out state, property type, and date range.");
@@ -59,6 +58,17 @@ function Home() {
     }
     loadHouses(houseExample);
   };
+
+  // useEffect(() => {
+  //   axios.get("http://127.0.0.1:5000/houses")
+  //     .then((res) => setHouses(res.data))
+  //     .catch((err) => console.error("Error fetching houses:", err));
+  // }, []);
+
+
+
+
+
 
   return (
     <div
@@ -70,7 +80,7 @@ function Home() {
         textAlign: "center"
       }}
     >
-
+      {/* NEW: User ID badge at top-right */}
       <div style={{
         position: "absolute",
         top: "20px",
@@ -78,7 +88,7 @@ function Home() {
         padding: "10px 15px",
         backgroundColor: "#776b68ff",
         color: "white",
-        borderRadius: "12px",
+        borderRadius: "15px",
         fontSize: "16px",
         fontWeight: "bold"
       }}>
@@ -101,48 +111,57 @@ function Home() {
         >
           User Reports Table
         </button>
+
+        <button
+          onClick={() => navigate("/favorite_report")}
+          style={buttonStyle}
+        >
+          Favorite Reports Table
+        </button>
+
         <button
           onClick={() => navigate("/price_ranking")}
           style={buttonStyle}
         >
           City Price Ranking
         </button>
+        
         <button
           onClick={() => navigate("/show_metric")}
           style={buttonStyle}
         >
           Show Metric
         </button>
-
       </div>
-
+      
       <div
       style={{
           display: "flex",
           gap: "20px",
           marginTop: "20px",
+          flexDirection: "column",
+          // backgroundColor: "white",
         }}
       >
 
-      
-      <div
+        <h2 style={{ color: "#493f3cff", marginBottom: "0px", textAlign:"center" }}>Filter Houses</h2>
+        <div
         style={{
           backgroundColor: "white",
-          width: "20%",
-          margin: "20px auto 0",
-          padding: "30px",
-          border: "2px solid black",
-          borderRadius: "10px",
+          width: "82%",
+          margin: "40px auto 0",
+          padding: "50px",
+          border: "2px solid White",
+          borderRadius: "15px",
           textAlign: "left"
         }}
       >
-        <h2 style={{ marginBottom: "15px" }}>Filter Houses</h2>
 
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "16px",
+            gap: "20px",
           }}
         >
           <label>State</label>
@@ -169,7 +188,7 @@ function Home() {
 
           <label>Period Begin</label>
           <input
-            type="text"
+            type="date"
             style={inputStyle}
             value={houseExample.period_begin}
             onChange={(e) => setHouseExample({ ...houseExample, period_begin: e.target.value })}
@@ -178,14 +197,13 @@ function Home() {
 
           <label>Period End</label>
           <input
-            type="text"
+            type="date"
             style={inputStyle}
             value={houseExample.period_end}
             onChange={(e) => setHouseExample({ ...houseExample, period_end: e.target.value })}
             placeholder="YYYY-MM-DD"
           />
         </div>
-
         <div style={{ textAlign: "center", marginTop: "10px" }}>
           <button onClick={handleHouseSearch} style={buttonStyle}>
             Search Houses
@@ -201,14 +219,15 @@ function Home() {
           justifyContent: "center",
           alignItems: "flex-start"
         }}
-      >
-        {houses.length === 0? <p>No house data found for this query</p>:
+        >
+
+        {houses.length == 0? <p>No house data found for this query</p>:
         <>
           <HouseTable houses={houses} />
           <MapView houses={houses} />
         </>
         }
-      </div>
+        </div>
       </div>
     </div>
   );
@@ -227,7 +246,7 @@ const inputStyle = {
 const buttonStyle = {
   width: "120px",
   padding: "10px",
-  fontSize: "16px",
+  fontSize: "20px",
   border: "2px solid #776b68ff",
   backgroundColor: "#776b68ff",
   color: "white",

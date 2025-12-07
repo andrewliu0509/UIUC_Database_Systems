@@ -40,9 +40,20 @@ export default function HouseTable({ houses }) {
     return (
       houses.length === 0 ? <p>No houses found.</p> :
         <>
-      <div style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto", border: "2px solid pink" }}>
-        <h3>House Data:</h3>
-        
+      
+      {/* <div style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto", border: "2px solid white" }}> */}
+      <div
+          style={{
+            width: "90%",
+            margin: "40px auto 0",
+            padding: "20px",
+            backgroundColor: "white",
+            borderRadius: "15px",
+            // border: "2px solid #555",
+          }}
+        >
+        {/* <h2 style={{color: "#493f3cff"}}>House Data</h2> */}
+
         <table border="1" cellPadding="5" style={{ borderCollapse: "collapse", width: "100%" }}>
           <thead>
             <tr>

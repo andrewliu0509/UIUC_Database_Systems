@@ -16,10 +16,11 @@ BEGIN
                 h.period_end,
                 l.us_state,
                 h.property_type,
-                h.median_sale_price 
+                AVG(h.median_sale_price) AS median_sale_price 
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end 
                 AND l.us_state = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.us_state, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'median_list_price' THEN
@@ -28,10 +29,11 @@ BEGIN
                 h.period_end,
                 l.us_state,
                 h.property_type,
-                h.median_list_price 
+                AVG(h.median_list_price) AS median_list_price
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end 
                 AND l.us_state = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.us_state, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'median_ppsf' THEN
@@ -40,10 +42,11 @@ BEGIN
                 h.period_end,
                 l.us_state,
                 h.property_type,
-                h.median_ppsf 
+                AVG(h.median_ppsf) AS median_ppsf
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end 
                 AND l.us_state = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.us_state, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'median_list_ppsf' THEN
@@ -52,10 +55,11 @@ BEGIN
                 h.period_end,
                 l.us_state,
                 h.property_type,
-                h.median_list_ppsf 
+                AVG(h.median_list_ppsf) AS median_list_ppsf 
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end 
                 AND l.us_state = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.us_state, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'homes_sold' THEN
@@ -64,10 +68,11 @@ BEGIN
                 h.period_end,
                 l.us_state,
                 h.property_type,
-                h.homes_sold 
+                SUM(h.homes_sold) AS homes_sold
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end 
                 AND l.us_state = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.us_state, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'new_listings' THEN
@@ -76,10 +81,11 @@ BEGIN
                 h.period_end,
                 l.us_state,
                 h.property_type,
-                h.new_listings 
+                SUM(h.new_listings) AS new_listings 
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end 
                 AND l.us_state = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.us_state, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'inventory' THEN
@@ -88,10 +94,11 @@ BEGIN
                 h.period_end,
                 l.us_state,
                 h.property_type,
-                h.inventory 
+                SUM(h.inventory) AS inventory
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end 
                 AND l.us_state = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.us_state, h.property_type
             ORDER BY h.period_begin;
         END IF;
 
@@ -103,10 +110,11 @@ BEGIN
                 h.period_end,
                 l.parent_metro_region,
                 h.property_type,
-                h.median_sale_price
+                AVG(h.median_sale_price) AS median_sale_price
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end
                 AND l.parent_metro_region = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.parent_metro_region, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'median_list_price' THEN
@@ -115,10 +123,11 @@ BEGIN
                 h.period_end,
                 l.parent_metro_region,
                 h.property_type,
-                h.median_list_price
+                AVG(h.median_list_price) AS median_list_price
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end
                 AND l.parent_metro_region = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.parent_metro_region, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'median_ppsf' THEN
@@ -127,10 +136,11 @@ BEGIN
                 h.period_end,
                 l.parent_metro_region,
                 h.property_type,
-                h.median_ppsf
+                AVG(h.median_ppsf) AS median_ppsf
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end
                 AND l.parent_metro_region = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.parent_metro_region, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'median_list_ppsf' THEN
@@ -139,10 +149,11 @@ BEGIN
                 h.period_end,
                 l.parent_metro_region,
                 h.property_type,
-                h.median_list_ppsf
+                AVG(h.median_list_ppsf) AS median_list_ppsf
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end
                 AND l.parent_metro_region = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.parent_metro_region, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'homes_sold' THEN
@@ -151,10 +162,11 @@ BEGIN
                 h.period_end,
                 l.parent_metro_region,
                 h.property_type,
-                h.homes_sold
+                SUM(h.homes_sold) AS homes_sold
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end
                 AND l.parent_metro_region = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.parent_metro_region, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'new_listings' THEN
@@ -163,10 +175,11 @@ BEGIN
                 h.period_end,
                 l.parent_metro_region,
                 h.property_type,
-                h.new_listings
+                SUM(h.new_listings) AS new_listings
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end
                 AND l.parent_metro_region = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.parent_metro_region, h.property_type
             ORDER BY h.period_begin;
 
         ELSEIF sm_query_type = 'inventory' THEN
@@ -175,13 +188,14 @@ BEGIN
                 h.period_end,
                 l.parent_metro_region,
                 h.property_type,
-                h.inventory
+                SUM(h.inventory) AS inventory
             FROM House h NATURAL JOIN Location l
             WHERE h.period_begin >= sm_period_begin AND h.period_end <= sm_period_end
                 AND l.parent_metro_region = sm_location_value AND h.property_type = sm_property_type
+            GROUP BY h.period_begin, h.period_end, l.parent_metro_region, h.property_type
             ORDER BY h.period_begin;
         END IF;
-        
+
     ELSE
 
         IF sm_query_type = 'median_sale_price' THEN

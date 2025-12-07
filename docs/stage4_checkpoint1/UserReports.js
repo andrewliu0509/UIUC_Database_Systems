@@ -6,7 +6,8 @@ function UserReports() {
   const [reports, setReports] = useState([]);
   const [form, setForm] = useState({
     report_id: "",
-    location: "",
+    city: "",
+    state:"",
     property_type: "All Residential",
     sold_price: "",
     list_price: "",
@@ -28,14 +29,6 @@ function UserReports() {
     } catch (err) {
       console.error("Error fetching user reports:", err);
     }
-    // axios.get("http://127.0.0.1:5000/user_reports", {
-    //   user_id: user_id, 
-    // })
-    //   .then((res) => setReports(res.data))
-    //   .catch((err) => {
-    //     console.error("Error fetching user reports:", err);
-    //     // alert("Failed to show user reports.");
-    //   });
   };
 
   useEffect(() => {
@@ -53,7 +46,7 @@ function UserReports() {
         alert("Report inserted successfully!");
         await reload();
       }
-      else{
+      else if (response.data.status === "failed to insert due to lacking fields") {
         alert("Failed to insert. Please fill out every field.");
       }
     } catch (err) {
@@ -98,9 +91,11 @@ function UserReports() {
   };
 
   const handleSelect = (id) => {
-    setSelectedReport((prev) =>
-    prev.includes(id)? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    if (selectedReport.includes(id)) {
+        setSelectedReport(selectedReport.filter((id) => id !== id));
+    } else {
+        setSelectedReport([...selectedReport, id]);
+    }
   };
 
   const handleDelete = async () => {
@@ -138,8 +133,9 @@ return (
           onClick={() => navigate("/app")}
           style={{...buttonStyle}}
         >
-          Back to Home
+          Home Page
         </button>
+        <h2 style={{ color: "#493f3cff", textAlign: "center", marginBottom: "20px" }}>Reporting Form</h2>
         <div
           style={{
             backgroundColor: "white",
@@ -150,7 +146,7 @@ return (
             borderRadius: "15px",
           }}
         >
-            <h2 style={{marginBottom: "20px" }}>Form:</h2>
+            {/* <h2 style={{marginBottom: "20px" }}>Form:</h2> */}
             <div
               style={{
                 display: "grid",
@@ -168,14 +164,26 @@ return (
                     }
                 />
 
-                <label>Location</label>
+                <label>city</label>
                 <input
                     type="text"
                     style={inputStyle}
-                    value={form.location}
+                    value={form.city}
                     onChange={(e) =>
-                        setForm({ ...form, location: e.target.value })
+                        setForm({ ...form, city: e.target.value })
                     }
+                    placeholder="eg., Fremont"
+                />
+
+                <label>state</label>
+                <input
+                    type="text"
+                    style={inputStyle}
+                    value={form.state}
+                    onChange={(e) =>
+                        setForm({ ...form, state: e.target.value })
+                    }
+                    placeholder="eg., California"
                 />
 
                 <label>Property Type</label>
@@ -256,7 +264,7 @@ return (
                     onClick={handleInsert}
                     style={buttonStyle}
                 >
-                Insert
+                Add
                 </button>
 
                 {/* Update button */}
@@ -269,15 +277,15 @@ return (
             </div>
         </div>
 
+        <h2 style={{ color: "#493f3cff", textAlign: "center", marginBottom: "20px" }}>My Reports</h2>
         <div
           style={{
             width: "90%",
             margin: "40px auto 0",
-            maxHeight: "400px",
-            overflowY: "auto",
+            padding: "20px",
             backgroundColor: "white",
-            border: "2px solid #555",
             borderRadius: "15px",
+            // border: "2px solid #555",
           }}
         >
           <table border="1" cellPadding="5" style={{ borderCollapse: "collapse", width: "100%" }}>

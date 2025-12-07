@@ -94,13 +94,6 @@ def login():
             }
         ).first()
 
-        # count = result.scalar() or 0
-
-    # Return user_id to save it in frontend
-    # if count >= 1:
-    #     return jsonify({"success": True, "user_id": result[0]})
-    # else:
-    #     return jsonify({"success": False})
     print(f"attempted to login user: {user_name}")
     if result:
         return jsonify({"success": True, "user_id": result[0]})
@@ -173,7 +166,8 @@ def get_user_reports():
 def insert_user_reports():
     data = request.json
     user_id = data.get("user_id", "")
-    location_keyword = data.get("location", "")
+    city = data.get("city", "")
+    state = data.get("state", "")
     property_type = data.get("property_type", "")
     sold_price = data.get("sold_price", "")
     list_price = data.get("list_price", "")
@@ -181,7 +175,8 @@ def insert_user_reports():
     sold_time = data.get("sold_time", "")
     square_feet = data.get("square_feet", "")
 
-    if not [location_keyword, property_type, sold_price, list_price, list_time, sold_time, square_feet]:
+    required = [city, state, property_type, sold_price, list_price, list_time, sold_time, square_feet]
+    if any(field == "" for field in required):
         return jsonify({"status": "failed to insert due to lacking fields"})
 
     with engine.connect() as conn:
@@ -190,11 +185,13 @@ def insert_user_reports():
             text("""
                 SELECT region_id
                 FROM Location
-                WHERE city LIKE :location_keyword 
-                 or us_state LIKE :location_keyword 
-                 or parent_metro_region LIKE :location_keyword
+                WHERE city = :city 
+                and us_state = :us_state 
             """),
-            {"location_keyword": f"%{location_keyword}%"}
+            {
+                "city": city,
+                "us_state": state
+            }
         ).fetchone()
         region_id = result.region_id
 
@@ -232,7 +229,8 @@ def insert_user_reports():
 def update_user_reports():
     data = request.json
     user_id = data.get("user_id", "")
-    location_keyword = data.get("location", "")
+    city = data.get("city", "")
+    state = data.get("state", "")
     property_type = data.get("property_type", "")
     sold_price = data.get("sold_price", "")
     list_price = data.get("list_price", "")
@@ -243,6 +241,9 @@ def update_user_reports():
 
     if not report_id:
         return jsonify({"status": "failed to update due to no report_id"})
+    required = [city, state, property_type, sold_price, list_price, list_time, sold_time, square_feet]
+    if any(field == "" for field in required):
+        return jsonify({"status": "failed to update due to lacking fields"})
 
     with engine.connect() as conn:
         #get original report
@@ -257,40 +258,20 @@ def update_user_reports():
         if not original_report:
             return jsonify({"status": "report not found"})
         
-        # update_fields = dict(original_report._mapping)
-
-        # for field in ["user_id", "property_type", "sold_price", "list_price", "list_time", "sold_time", "square_feet"]:
-        #     if field in data and data[field] not in [None, ""]:
-        #         update_fields[field] = data[field]
-        
-        # user_id = update_fields["user_id"]
-        # property_type = update_fields["property_type"]
-        # sold_price = update_fields["sold_price"]
-        # list_price = update_fields["list_price"]
-        # list_time = update_fields["list_time"]
-        # sold_time = update_fields["sold_time"]
-        # square_feet = update_fields["square_feet"]
-        # print(update_fields)
-        # get region_id
-        # location_keyword = data.get("location", "")
-        # if location_keyword and location_keyword != "":
         result = conn.execute(
             text("""
                 SELECT region_id
                 FROM Location
-                WHERE city LIKE :location_keyword 
-                or us_state LIKE :location_keyword 
-                or parent_metro_region LIKE :location_keyword
+                WHERE city = :city 
+                and us_state = :us_state
             """),
-            {"location_keyword": f"%{location_keyword}%"}
+            {
+                "city": city,
+                "us_state": state
+            }
         ).fetchone()
-        #     if result:
-        #         region_id = result._mapping["region_id"]
-        #     else:
-        #         region_id = original_report._mapping["region_id"]
-        # else:
-        #     region_id = original_report._mapping["region_id"]
         region_id = result.region_id
+
         # update report
         conn.execute(
             text("""
@@ -352,7 +333,7 @@ def price_ranking():
     pr_metric = data.get("metric")
 
     if not (pr_city and pr_state and pr_property_type_id and pr_period_start and pr_period_end):
-        return jsonify({"error": "Missing required fields"})
+        return jsonify({"error": "Missing required fields"}), 400
 
     with engine.connect() as conn:
         result = conn.execute(
@@ -424,7 +405,170 @@ def show_metric():
         rows = result.mappings().all()
     return jsonify([dict(r) for r in rows])
 
+#show user's favorite houses
+@app.route("/favorites_report", methods=["GET"])
+def get_favorites_report():
+    user_id = request.args.get("user_id")
 
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT u.report_id, u.user_id, u.region_id, u.property_type, u.sold_price, u.list_price, u.list_time, u.sold_time, u.square_feet
+                FROM User_Reporting u
+                JOIN Favorites_Report f on u.report_id = f.report_id
+                WHERE f.favorite_user_id = :user_id
+            """),
+            {"user_id": user_id}
+        )
+        rows = [dict(row._mapping) for row in result]
+    return jsonify(rows)
+
+# search favorite houses for a user
+@app.route("/favorites_report_search", methods=["POST"])
+def search_favorites_report():
+    # favorite_user_id = data.get("user_id", "")
+    data = request.json
+    city = data.get("city", "")
+    state = data.get("state", "")
+    property_type = data.get("property_type", "")
+    sold_price = data.get("sold_price", "")
+    list_price = data.get("list_price", "")
+    list_time = data.get("list_time", "")
+    sold_time = data.get("sold_time", "")
+    square_feet = data.get("square_feet", "")
+
+    required = [city, state, property_type, sold_price, list_price, list_time, sold_time, square_feet]
+    if any(field == "" for field in required):
+        return jsonify({"status": "failed to search due to lacking fields"})
+    
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT region_id
+                FROM Location
+                WHERE city = :city 
+                and us_state = :us_state
+            """),
+            {
+                "city": city,
+                "us_state": state
+            }
+        ).fetchone()
+        region_id = result.region_id
+
+        result = conn.execute(
+            text("""
+                SELECT *
+                FROM User_Reporting
+                WHERE region_id = :region_id
+                and property_type = :property_type
+                and sold_price <= :sold_price
+                and list_price <= :list_price
+                and list_time >= :list_time
+                and sold_time <= :sold_time
+                and square_feet <= :square_feet
+            """),
+            {
+                "region_id": region_id,
+                "property_type": property_type,
+                "sold_price": sold_price,
+                "list_price": list_price,
+                "list_time": list_time,
+                "sold_time": sold_time,
+                "square_feet": square_feet
+            }
+        )
+        rows = [dict(row._mapping) for row in result]
+    return jsonify(rows)
+
+# favorite a report
+@app.route("/favorites_report", methods=["POST"])
+def insert_favorites_report():
+    data = request.json
+    favorite_user_id = data.get("favorite_user_id", "")
+    report_id = data.get("report_id", "")
+
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT report_id, user_id
+                FROM User_Reporting
+                WHERE report_id IN :report_id
+            """),
+            {
+                "report_id": tuple(report_id)
+            }
+        ).fetchall()
+        if not result:
+            return jsonify({"status": "report not found"})
+
+        result_existing = conn.execute(
+            text("""
+                SELECT report_id
+                FROM Favorites_Report
+                WHERE report_id IN :report_id
+            """),
+            {
+                "report_id": tuple(report_id)
+            }
+        ).fetchall()
+        if result_existing:
+            return jsonify({"status": "report already favorited"})
+
+        for id in result:
+            conn.execute(
+                text("""
+                    INSERT INTO Favorites_Report (favorite_user_id, reporting_user_id, report_id)
+                    VALUES (:favorite_user_id, :reporting_user_id, :report_id)
+                """),
+                {
+                    "favorite_user_id": favorite_user_id,
+                    "reporting_user_id": id._mapping["user_id"],
+                    "report_id": id._mapping["report_id"]
+                }
+            )
+            conn.commit()
+
+    return jsonify({"status": "successfully insert"})
+
+# delete a favorite report
+@app.route("/favorites_report", methods=["DELETE"])
+def delete_favorites_report():
+    data = request.json
+    favorite_user_id = data.get("favorite_user_id", "")
+    report_id = data.get("report_id", "")
+
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT report_id, user_id
+                FROM User_Reporting
+                WHERE report_id IN :report_id
+            """),
+            {
+                "report_id": tuple(report_id)
+            }
+        ).fetchall()
+        if not result:
+            return jsonify({"status": "report not found"})
+
+        for id in result:
+            conn.execute(
+                text("""
+                    DELETE FROM Favorites_Report
+                    WHERE favorite_user_id = :favorite_user_id
+                    and report_id = :report_id
+                    and reporting_user_id = :reporting_user_id
+                """),
+                {
+                    "favorite_user_id": favorite_user_id,
+                    "report_id": id._mapping["report_id"],
+                    "reporting_user_id": id._mapping["user_id"]
+                }
+            )
+            conn.commit()
+
+    return jsonify({"status": "successfully delete"})
 
 if __name__ == "__main__":
     app.run(debug=False)

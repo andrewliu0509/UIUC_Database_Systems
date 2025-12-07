@@ -17,7 +17,7 @@ function AutoFitBounds({ positions }) {
     const latLngs = positions.map(item => L.latLng(item.pos.lat, item.pos.lng));
 
     const bounds = L.latLngBounds(latLngs);
-    map.fitBounds(bounds, { padding: [40, 40] }); // Add some padding
+    map.fitBounds(bounds, { padding: [40, 40] }); 
 
   }, [positions, map]);
 
@@ -26,10 +26,6 @@ function AutoFitBounds({ positions }) {
 
 
 export async function geocodeRegion(region) {
-  if (typeof region !== "string" || !region.trim()) {
-    console.warn("Invalid region value:", region);
-    return null;
-  }
   const key = region.trim().toLowerCase();
 
   if (key in geocodeCache) {

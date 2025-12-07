@@ -34,8 +34,8 @@ function ShowMetric() {
   ];
 
   const [form, setForm] = useState({
-    period_begin: "",
-    period_end: "",
+    period_begin: "2021-01-01",
+    period_end: "2022-10-28",
     location_type: "state",
     location_value: "",
     property_type: "All Residential",
@@ -111,7 +111,7 @@ function ShowMetric() {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
+      <h1 style={{ color:"#493f3cff", textAlign: "center", marginBottom: "30px" }}>
         Show Metric
       </h1>
 
@@ -119,7 +119,7 @@ function ShowMetric() {
         onClick={() => navigate("/app")}
         style={{ ...buttonStyle }}
       >
-        Back to Home
+        Home Page
       </button>
       <div
         style={{
@@ -127,11 +127,10 @@ function ShowMetric() {
           width: "82%",
           margin: "40px auto 0",
           padding: "50px",
-          border: "2px solid black",
+          border: "2px solid white",
+          borderRadius: "15px",
         }}
       >
-        <h2 style={{ marginBottom: "20px" }}>Form:</h2>
-
         <div
           style={{
             display: "grid",
@@ -141,7 +140,7 @@ function ShowMetric() {
         >
           <label>Period Begin</label>
           <input
-            type="text"
+            type="date"
             style={inputStyle}
             value={form.period_begin}
             onChange={(e) => setForm({ ...form, period_begin: e.target.value })}
@@ -150,7 +149,7 @@ function ShowMetric() {
 
           <label>Period End</label>
           <input
-            type="text"
+            type="date"
             style={inputStyle}
             value={form.period_end}
             onChange={(e) => setForm({ ...form, period_end: e.target.value })}
@@ -245,11 +244,12 @@ function ShowMetric() {
           width: "82%",
           margin: "30px auto 0",
           padding: "30px",
-          border: "2px solid black",
+          border: "2px solid white",
           height: "420px",
+          borderRadius: "15px",
         }}
       >
-        <h2 style={{ marginBottom: "10px" }}>Chart:</h2>
+        <h2 style={{ marginBottom: "10px", color:"#493f3cff" }}>Chart</h2>
 
         <div style={{ width: "100%", height: "340px" }}>
           <ResponsiveContainer>
@@ -280,10 +280,10 @@ function ShowMetric() {
         style={{
           width: "90%",
           margin: "30px auto 0",
-          maxHeight: "400px",
-          overflowY: "auto",
-          border: "2px solid #555",
+          padding: "20px",
+          // border: "2px solid #555",
           backgroundColor: "white",
+          borderRadius: "15px",
         }}
       >
         <table

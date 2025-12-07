@@ -5,7 +5,7 @@ function PriceRanking() {
   const [form, setForm] = useState({
     city: "",
     state: "",
-    property_type_id: "",
+    property_type_id: "-1",
     period_start: "",
     period_end: "",
     metric: "sales_price",
@@ -48,14 +48,14 @@ function PriceRanking() {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
+      <h1 style={{ color: "#493f3cff", textAlign: "center", marginBottom: "30px" }}>
         City Price Ranking
       </h1>
       <button
           onClick={() => navigate("/app")}
           style={{...buttonStyle}}
         >
-          Back to Home
+          Home Page
         </button>
       <div
         style={{
@@ -63,10 +63,11 @@ function PriceRanking() {
           width: "82%",
           margin: "40px auto 0",
           padding: "50px",
-          border: "2px solid black",
+          border: "2px solid white",
+          borderRadius: "15px",
         }}
       >
-        <h2 style={{ marginBottom: "20px" }}>Form:</h2>
+        {/* <h2 style={{ marginBottom: "20px" }}>Form:</h2> */}
 
         <div
           style={{
@@ -108,20 +109,20 @@ function PriceRanking() {
 
           <label>Period Begin</label>
           <input
-            type="text"
+            type="date"
             style={inputStyle}
             value={form.period_start}
             onChange={(e) => setForm({ ...form, period_start: e.target.value })}
-            placeholder="yyyy/mm/dd"
+            // placeholder="yyyy/mm/dd"
           />
 
           <label>Period End</label>
           <input
-            type="text"
+            type="date"
             style={inputStyle}
             value={form.period_end}
             onChange={(e) => setForm({ ...form, period_end: e.target.value })}
-            placeholder="yyyy/mm/dd"
+            // placeholder="yyyy/mm/dd"
           />
 
           <label>Metric</label>
@@ -155,10 +156,10 @@ function PriceRanking() {
         style={{
           width: "90%",
           margin: "40px auto 0",
-          maxHeight: "400px",
-          overflowY: "auto",
-          border: "2px solid #555",
+          padding: "20px",
+          // border: "2px solid #555",
           backgroundColor: "white",
+          borderRadius: "15px",
         }}
       >
         <table
