@@ -620,10 +620,11 @@ def insert_favorites_report():
             text("""
                 SELECT report_id
                 FROM Favorites_Report
-                WHERE report_id IN :report_id
+                WHERE report_id IN :report_id AND favorite_user_id = :favorite_user_id
             """),
             {
-                "report_id": tuple(report_id)
+                "report_id": tuple(report_id),
+                "favorite_user_id": favorite_user_id
             }
         ).fetchall()
         if result_existing:
