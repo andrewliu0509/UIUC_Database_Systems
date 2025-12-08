@@ -21,7 +21,7 @@
 | ----------- | ---------------------- |
 |  Title      |       RobinSpot        |
 | System URL  |      link_to_system    |
-| Video Link  |      link_to_video     |
+| Video Link  |      https://www.youtube.com/watch?v=x_ANWdlJnMY     |
 
 ## Project Summary
 
