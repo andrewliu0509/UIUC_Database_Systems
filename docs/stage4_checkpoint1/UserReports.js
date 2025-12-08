@@ -98,6 +98,43 @@ function UserReports() {
     }
   };
 
+  const handleTransaction = async () => {
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/report_by_transaction", {
+          ...form,
+          user_id: user_id,
+        }
+      );
+
+      const status = response.data.status;
+
+      if (status === "successfully inserted") {
+        alert("Report inserted successfully!");
+        await reload();
+      }
+      else if (status === "failed to insert due to lacking fields") {
+        alert("Failed to insert. Please fill out every field.");
+      }
+      else if (status === "invalid location") {
+        alert("Invalid location. Please check the city and state.");
+      }
+      else if (status === "failed due to transaction condition") {
+        alert("Insert rejected: Duplicate report or outlier price.");
+      }
+      else if (status === "error") {
+        alert("Server error occurred: " + response.data.detail);
+      }
+      else {
+        alert("Unknown response from server.");
+      }
+
+    } catch (err) {
+      console.error("Insert error:", err);
+      alert("Insert Failed. Cannot reach server.");
+    }
+  };
+
+
   const handleDelete = async () => {
     if (selectedReport.length === 0) {
       alert("Please select at least one report to delete.");
@@ -273,6 +310,14 @@ return (
                     style={buttonStyle}
                 >
                 Update
+                </button>
+
+                {/* Run transaction */}
+                <button
+                    onClick={handleTransaction}
+                    style={buttonStyle}
+                >
+                Transaction
                 </button>
             </div>
         </div>

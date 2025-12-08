@@ -105,7 +105,6 @@ def add_data():
     new_item = request.json
     user_name = new_item["user_name"]
 
-    # --- Step 1: generate prefix from user_name ---
     # For example: "Andrew Liu" -> "al", "Samantha" -> "sa"
     parts = user_name.split()
     if len(parts) >= 2:
@@ -114,21 +113,17 @@ def add_data():
         prefix = user_name[:2].lower()  # fallback if only one word
 
     with engine.connect() as conn:
-        # --- Step 2: find existing count ---
         result = conn.execute(
             text("SELECT COUNT(*) FROM User WHERE user_id LIKE :prefix"),
             {"prefix": f"{prefix}%"}
         )
         count = result.scalar() or 0  # number of existing users with same prefix
 
-        # --- Step 3: assign next user_id ---
         user_id = f"{prefix}{count+1}"
 
-        # --- Step 4: hash the password ---
         raw_password = new_item["user_password"].encode("utf-8")
         hashed_password = hashlib.sha1(raw_password).hexdigest()  # 40-char SHA-1
 
-        # --- Step 5: insert into database ---
         conn.execute(
             text(
                 """INSERT INTO User (user_name, user_id, user_password)
@@ -321,6 +316,125 @@ def delete_user_reports():
         conn.commit()
 
     return jsonify({"status": "successfully delete"})
+
+# Insert a new report from user with transaction
+@app.route("/report_by_transaction", methods=["POST"])
+def insert_under_transaction():
+    data = request.json
+    user_id = data.get("user_id", "")
+    city = data.get("city", "")
+    state = data.get("state", "")
+    property_type = data.get("property_type", "")
+    list_time = data.get("list_time", "")
+    sold_time = data.get("sold_time", "")
+
+    try:
+        # Convert the price and area fields from string to float
+        sold_price = float(data.get("sold_price", 0))
+        list_price = float(data.get("list_price", 0))
+        square_feet = float(data.get("square_feet", 0))
+    except (ValueError, TypeError):
+        # Handle cases where the string isn't a valid number (e.g., "abc")
+        return jsonify({"status": "failed to insert: Sold Price, List Price, or Square Feet must be valid numbers."})
+
+    required = [city, state, property_type, sold_price, list_price, list_time, sold_time, square_feet]
+    if any(field == "" for field in required):
+        return jsonify({"status": "failed to insert due to lacking fields"})
+
+    with engine.connect() as conn:
+        trans = conn.begin() 
+
+        try:
+            result = conn.execute(
+                text("""
+                    SELECT region_id
+                    FROM Location
+                    WHERE city = :city AND us_state = :us_state
+                """),
+                {"city": city, "us_state": state}
+            ).fetchone()
+
+            if not result:
+                trans.rollback()
+                return jsonify({"status": "invalid location"})
+
+            region_id = result.region_id
+
+            result = conn.execute(
+                text("""
+                    SELECT COUNT(*) AS cnt
+                    FROM User_Reporting u
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM User_Reporting u2
+                        JOIN User u3 ON u2.user_id = u3.user_id
+                        WHERE u2.region_id = :reg_id
+                          AND u2.square_feet = :sqft
+                          AND u2.sold_price = :price
+                          AND u3.user_name LIKE 'A%'
+                    )
+                """),
+                {"reg_id": region_id, "sqft": square_feet, "price": sold_price}
+            ).fetchone()
+
+            duplicate_report = result.cnt
+
+            result = conn.execute(
+                text("""
+                    SELECT AVG(h.median_sale_price) AS avg_price
+                    FROM Location l
+                    JOIN House h ON l.region_id = h.region_id
+                    WHERE l.region_id = :reg_id
+                    GROUP BY l.region_id
+                """),
+                {"reg_id": region_id}
+            ).fetchone()
+
+            avg_sale = result.avg_price if result else 0
+
+            # Check if insertion allowed
+            if duplicate_report != 0 or avg_sale * 10 < sold_price:
+                trans.rollback()
+                return jsonify({"status": "failed due to transaction condition"})
+
+            result = conn.execute(
+                text("SELECT MAX(report_id) FROM User_Reporting")
+            )
+            max_id = result.scalar() or 0
+            new_report_id = max_id + 1
+
+            # Insert record
+            conn.execute(
+                text("""
+                    INSERT INTO User_Reporting (
+                        report_id, user_id, region_id, property_type,
+                        sold_price, list_price, list_time, sold_time, square_feet
+                    )
+                    VALUES (
+                        :rid, :uid, :reg_id, :ptype,
+                        :sold, :list, :ltime, :stime, :sqft
+                    )
+                """),
+                {
+                    "rid": new_report_id,
+                    "uid": user_id,
+                    "reg_id": region_id,
+                    "ptype": property_type,
+                    "sold": sold_price,
+                    "list": list_price,
+                    "ltime": list_time,
+                    "stime": sold_time,
+                    "sqft": square_feet
+                }
+            )
+
+            trans.commit()
+            return jsonify({"status": "successfully inserted"})
+
+        except Exception as e:
+            trans.rollback()
+            return jsonify({"status": "error", "detail": str(e)})
+
 
 @app.route("/price_ranking", methods=["POST"])
 def price_ranking():
